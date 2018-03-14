@@ -1,5 +1,27 @@
 # Configuration file for jupyterhub.
 
+c.JupyterHub.spawner_class = 'wrapspawner.ProfilesSpawner'
+c.Spawner.http_timeout = 120
+# Slurm options can be found at https://github.com/jupyterhub/batchspawner/blob/master/batchspawner/batchspawner.py#L78
+slurm_default = dict(req_partition='interactive', req_options='', req_workdir='/scratch/work/darstr1')
+c.ProfilesSpawner.profiles = [
+    ("Local process", 'local', 'jupyterhub.spawner.LocalProcessSpawner', dict() ),
+    ("Slurm 1G 3day", 'slurm1', 'batchspawner.SlurmSpawner',
+         {**slurm_default, **dict(req_partition='interactive', req_memory='1024', req_runtime='3-0')}),
+    ("Slurm 10G 4h", 'slurm2', 'batchspawner.SlurmSpawner',
+         {**slurm_default, **dict(req_partition='interactive', req_mem='10240', nprocs=1, runtime='0-4')}),
+]
+# batchspawner needs: sudo -E -u {username}    sbatch  /  squeue -h -j {job_id} -O "%T %B"  /  scancel {job_id}.
+
+
+c.Authenticator.admin_users = {'darstr1'}
+#c.Authenticator.whitelist = {'mal', 'zoe', 'inara', 'kaylee'}
+c.LocalAuthenticator.group_whitelist = {'networks'}
+
+C.Spawner.notebook_dir = '/'                     # visible filesystem tree
+c.Spawner.default_url = '/tree/home/{username}'  # default start folder
+
+
 #------------------------------------------------------------------------------
 # Application(SingletonConfigurable) configuration
 #------------------------------------------------------------------------------
