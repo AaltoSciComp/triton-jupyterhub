@@ -1,25 +1,63 @@
 # Configuration file for jupyterhub.
 
+import os
+live = 'DEV' not in os.environ
+dev = 1 if not os.environ['DEV'].isdigit() else int(os.environ['DEV'])
+
+#
+# Connections, ports, config files.
+#
+c.JupyterHub.hub_ip = '10.10.254.30'  # single-user servers need to be able
+if live:
+    #c.JupyterHub.ip = '127.0.0.1'  # default *
+    #c.JupyterHub.port = 80000  # default 8000
+    c.JupyterHub.cookie_secret_file = '/etc/jupyterhub/jupyterhub_cookie_secret'
+    c.JupyterHub.db_url = 'sqlite:////etc/jupyterhub/jupyterhub.sqlite'
+# Dev server settings
+else:
+    c.JupyterHub.hub_port = 8081 + dev*200
+    c.JupyterHub.port = 8000 + dev*200
+    c.ConfigurableHTTPProxy.api_url = 'http://127.0.0.1:%s'%(8001+dev*200)
+    c.JupyterHub.cookie_secret_file = '/etc/jupyterhub/jupyterhub_cookie_secret-dev'
+    c.JupyterHub.db_url = 'sqlite:////etc/jupyterhub/jupyterhub-dev.sqlite'
+    c.JupyterHub.base_url = '/dev'
+
+#
+# Authentication config
+#
+c.Authenticator.admin_users = {'darstr1'}
+c.LocalAuthenticator.group_whitelist = {'triton-users'}
+c.Spawner.disable_user_config = True                 # security-related
+c.JupyterHub.cookie_max_age_days = 3
+
+#
+# Spawner config
+#
 c.JupyterHub.spawner_class = 'wrapspawner.ProfilesSpawner'
 c.Spawner.http_timeout = 120
 # Slurm options can be found at https://github.com/jupyterhub/batchspawner/blob/master/batchspawner/batchspawner.py#L78
-slurm_default = dict(req_partition='interactive', req_options='', req_workdir='/scratch/work/darstr1')
+batch_cmd="""\
+unset XDG_RUNTIME_DIR
+sh /share/apps/jupyterhub/setup_tree.sh
+/share/apps/jupyterhub/live/miniconda/bin/jupyterhub-singleuser"""
+slurm_default = dict(req_partition='interactive', req_options='', req_workdir='/scratch/work/darstr1',
+                     cmd=batch_cmd)
 c.ProfilesSpawner.profiles = [
-    ("Local process", 'local', 'jupyterhub.spawner.LocalProcessSpawner', dict() ),
-    ("Slurm 1G 3day", 'slurm1', 'batchspawner.SlurmSpawner',
-         {**slurm_default, **dict(req_partition='interactive', req_memory='1024', req_runtime='3-0')}),
+    #("Local process", 'local', 'jupyterhub.spawner.LocalProcessSpawner', dict() ),
+    ("Slurm 1G 1day", 'slurm1', 'batchspawner.SlurmSpawner',
+         {**slurm_default, **dict(req_partition='interactive', req_memory='1024', req_runtime='1-0')}),
     ("Slurm 10G 4h", 'slurm2', 'batchspawner.SlurmSpawner',
          {**slurm_default, **dict(req_partition='interactive', req_mem='10240', nprocs=1, runtime='0-4')}),
 ]
 # batchspawner needs: sudo -E -u {username}    sbatch  /  squeue -h -j {job_id} -O "%T %B"  /  scancel {job_id}.
 
+#c.Spawner.notebook_dir = '/'                     # visible filesystem tree
+c.Spawner.notebook_dir = '/scratch/work/{username}/.jupyterhub-tree/'     # visible filesystem tree
+#c.Spawner.default_url = ''
+#c.Spawner.default_url = '/lab'
+#c.Spawner.args = ['--debug', '--profile=PHYS131']  # single-user server args
 
-c.Authenticator.admin_users = {'darstr1'}
-#c.Authenticator.whitelist = {'mal', 'zoe', 'inara', 'kaylee'}
-c.LocalAuthenticator.group_whitelist = {'networks'}
 
-C.Spawner.notebook_dir = '/'                     # visible filesystem tree
-c.Spawner.default_url = '/tree/home/{username}'  # default start folder
 
 
 #------------------------------------------------------------------------------
