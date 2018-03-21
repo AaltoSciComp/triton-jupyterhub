@@ -18,43 +18,59 @@ run:
 # - jupyterlab
 # - the .jupyterhub-tree directory
 
+default:
+	echo "Must give a command to run"
 
-setup:
+restart:
+	systemctl stop jupyterhub
+
+emergency_stop:
+	systemctl restart jupyterhub
+
+setup_conda:
 	false
-#	ml load anaconda3
-#	ml load teflon
-#	conda create --prefix $PWD/conda python pip ipython
 	sh ../Miniconda3-latest-Linux-x86_64.sh -p $PWD/miniconda
-	source activate $PWD/miniconda
-	conda install -c conda-forge jupyterhub
-#	( umask 700 ; openssl rand -hex 32 > jupyterhub_cookie_secret )
 
+setup_packages:
+	false
+#	# MUST SOURCE THIS YOURSELF BEFORE RUNNING DO THIS YOURSELF
+	source activate $PWD/miniconda
+#	#
+	test ! -z "$CONDA_PREFIX"
+	conda install -c conda-forge jupyterhub
 	git clone gh:jupyterhub/batchspawner
 	pip install -e batchspawner/
 	pip install git+https://github.com/jupyterhub/wrapspawner
 
 	conda install notebook # only where it is being run
 
-# 	ssd1
-#	chgrp jupyterhub-daemon /export/soft/apps_el7/jupyterhub/live/jupyterhub_cookie_secret
-
 	pip install jupyterlab
 	jupyter serverextension enable --py jupyterlab --sys-prefix
-#	c.Spawner.default_url = '/lab'
 
-
-# 	#make user on install2
+user_setup:
 #	#adduser --user-group --no-create-home jupyterhub-daemon
 #	#make -C /var/yp
 
 
-KERNEL_PREFIX=/share/apps/jupyterhub/live/miniconda/
+# This is the place where all kernels are installed
 # The jupyter kernelspec https://jupyter-client.readthedocs.io/en/stable/kernels.html
+KERNEL_PREFIX=/share/apps/jupyterhub/live/miniconda/
 
 # MUST load proper miniconda first!
-kernels:
+# Take the lmod environment:
+# ( echo "  \"env\": {" ; for x in LD_LIBRARY_PATH LIBRARY_PATH MANPATH PATH PKG_CONFIG_PATH ; do echo "    \"$x\": \"${!x}\"", ; done ; echo "  }" ) >> ~/.local/share/jupyter/kernels/ir/kernel.json
+
+extensions_install:
+	test ! -z "$CONDA_PREFIX"
 	jupyter kernelspec list
 
+#	# Widgets
+	pip install ipywidgets
+	jupyter nbextension enable --py widgetsnbextension --sys-prefix
+
+#	# Notebook diff and merge tools
+	pip install nbdime
+	nbdime reg-extensions --sys-prefix
 
 #	# Lmod integration
 #	# https://github.com/cmd-ntrf/jupyter-lmod
@@ -63,12 +79,14 @@ kernels:
 	jupyter nbextension enable jupyterlmod --py --sys-prefix
 	jupyter serverextension enable --py jupyterlmod --sys-prefix
 
-#	# javascript extensions
+#	# javascript extensions for various things
 	pip install jupyter_contrib_nbextensions
 	jupyter contrib nbextension install --sys-prefix
 #	#jupyter nbextension enable [...name...]
 	jupyter nbextension enable varInspector/main --sys-prefix
 
+kernels_manual:
+	false
 
 #	# MATLAB
 #	# https://github.com/imatlab/imatlab
@@ -84,13 +102,18 @@ kernels:
 
 #	# R
 #	# https://irkernel.github.io/installation/
+#	# Needs to be installed in R, then installed from there.
 
 #	# BASH
 #	# https://github.com/takluyver/bash_kernel
 	pip install bash_kernel
 	python -m bash_kernel.install --sys-prefix
 
-
-
-
 	jupyter kernelspec list
+
+CONDA_AUTO_KERNELS="anaconda2/5.1.0-cpu anaconda2/5.1.0-gpu anaconda3/5.1.0-cpu anaconda3/5.1.0-gpu"
+kernels_auto:
+	( ml purge ; ml load anaconda2/latest ; ipython kernel install --name=python2 --display="Python 2/anaconda2/latest" --prefix=/share/apps/jupyterhub/live/miniconda/ )
+	( ml purge ; ml load anaconda3/latest ; ipython kernel install --name=python3 --display="Python 3/anaconda3/lat
+est" --prefix=/share/apps/jupyterhub/live/miniconda/ )
+	for mod in $(CONDA_AUTO_KERNELS) ; do ( ml purge ; ml load $$mod ; ipython kernel install --name=`echo $$mod | tr / _` --display="$$mod" --prefix=/share/apps/jupyterhub/live/miniconda/ ) ; done

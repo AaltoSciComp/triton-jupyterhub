@@ -2,7 +2,7 @@
 
 import os
 live = 'DEV' not in os.environ
-dev = 1 if not os.environ['DEV'].isdigit() else int(os.environ['DEV'])
+dev = 1 if not os.environ.get('DEV', '').isdigit() else int(os.environ['DEV'])
 
 #
 # Connections, ports, config files.
@@ -22,6 +22,11 @@ else:
     c.JupyterHub.db_url = 'sqlite:////etc/jupyterhub/jupyterhub-dev.sqlite'
     c.JupyterHub.base_url = '/dev'
 
+# Prevents servers from being killed
+if 'JUPYTER_PERSIST_ACROSS_RESTARTS' in os.environ:
+    c.JupyterHub.cleanup_servers = False
+
+
 #
 # Authentication config
 #
@@ -39,15 +44,17 @@ c.Spawner.http_timeout = 120
 batch_cmd="""\
 unset XDG_RUNTIME_DIR
 sh /share/apps/jupyterhub/setup_tree.sh
-/share/apps/jupyterhub/live/miniconda/bin/jupyterhub-singleuser"""
-slurm_default = dict(req_partition='interactive', req_options='', req_workdir='/scratch/work/darstr1',
+/share/apps/jupyterhub/live/miniconda/bin/python -E -s /share/apps/jupyterhub/live/miniconda/bin/jupyterhub-singleuser"""
+slurm_default = dict(req_partition='interactive', req_options='', req_workdir='/scratch/work/{user}',
                      cmd=batch_cmd)
 c.ProfilesSpawner.profiles = [
     #("Local process", 'local', 'jupyterhub.spawner.LocalProcessSpawner', dict() ),
-    ("Slurm 1G 1day", 'slurm1', 'batchspawner.SlurmSpawner',
-         {**slurm_default, **dict(req_partition='interactive', req_memory='1024', req_runtime='1-0')}),
-    ("Slurm 10G 4h", 'slurm2', 'batchspawner.SlurmSpawner',
-         {**slurm_default, **dict(req_partition='interactive', req_mem='10240', nprocs=1, runtime='0-4')}),
+    ("Slurm 10h 2G",  'slurm2', 'batchspawner.SlurmSpawner',
+         {**slurm_default, **dict(req_partition='jupyter-long', req_memory='2200', req_runtime='0-10')}),
+    ("Slurm 5day 2G", 'slurm5', 'batchspawner.SlurmSpawner',
+         {**slurm_default, **dict(req_partition='jupyter-long', req_memory='2200', req_runtime='5-0')}),
+    ("Slurm 4h 100G", 'slurm8', 'batchspawner.SlurmSpawner',
+         {**slurm_default, **dict(req_partition='jupyter-short', req_mem='100200', nprocs=1, runtime='0-4')}),
 ]
 # batchspawner needs: sudo -E -u {username}    sbatch  /  squeue -h -j {job_id} -O "%T %B"  /  scancel {job_id}.
 
