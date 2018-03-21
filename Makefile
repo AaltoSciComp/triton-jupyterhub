@@ -27,14 +27,19 @@ restart:
 emergency_stop:
 	systemctl restart jupyterhub
 
+
+
 setup_conda:
 	false
 	sh ../Miniconda3-latest-Linux-x86_64.sh -p $PWD/miniconda
 
+
+
+# This is the very first setup that is needed.
 setup_packages:
 	false
-#	# MUST SOURCE THIS YOURSELF BEFORE RUNNING DO THIS YOURSELF
-	source activate $PWD/miniconda
+#	# MUST SOURCE THIS YOURSELF BEFORE RUNNING, outside of Make.
+#	source activate $PWD/miniconda
 #	#
 	test ! -z "$CONDA_PREFIX"
 	conda install -c conda-forge jupyterhub
@@ -47,19 +52,26 @@ setup_packages:
 	pip install jupyterlab
 	jupyter serverextension enable --py jupyterlab --sys-prefix
 
+
+
+# Done on the management node.
 user_setup:
 #	#adduser --user-group --no-create-home jupyterhub-daemon
 #	#make -C /var/yp
+
 
 
 # This is the place where all kernels are installed
 # The jupyter kernelspec https://jupyter-client.readthedocs.io/en/stable/kernels.html
 KERNEL_PREFIX=/share/apps/jupyterhub/live/miniconda/
 
-# MUST load proper miniconda first!
-# Take the lmod environment:
+# Note: Take the lmod environment:
 # ( echo "  \"env\": {" ; for x in LD_LIBRARY_PATH LIBRARY_PATH MANPATH PATH PKG_CONFIG_PATH ; do echo "    \"$x\": \"${!x}\"", ; done ; echo "  }" ) >> ~/.local/share/jupyter/kernels/ir/kernel.json
 
+
+
+# Install the different extensions to jupyter
+# NOTE: activate the anaconda environ first.
 extensions_install:
 	test ! -z "$CONDA_PREFIX"
 	jupyter kernelspec list
@@ -85,6 +97,9 @@ extensions_install:
 #	#jupyter nbextension enable [...name...]
 	jupyter nbextension enable varInspector/main --sys-prefix
 
+
+
+# Install kernels.  These require manual work so far.
 kernels_manual:
 	false
 
@@ -111,9 +126,11 @@ kernels_manual:
 
 	jupyter kernelspec list
 
+
+
+# These kernels can be installed automatically: just source anaconda and run this
 CONDA_AUTO_KERNELS="anaconda2/5.1.0-cpu anaconda2/5.1.0-gpu anaconda3/5.1.0-cpu anaconda3/5.1.0-gpu"
 kernels_auto:
 	( ml purge ; ml load anaconda2/latest ; ipython kernel install --name=python2 --display="Python 2/anaconda2/latest" --prefix=/share/apps/jupyterhub/live/miniconda/ )
-	( ml purge ; ml load anaconda3/latest ; ipython kernel install --name=python3 --display="Python 3/anaconda3/lat
-est" --prefix=/share/apps/jupyterhub/live/miniconda/ )
+	( ml purge ; ml load anaconda3/latest ; ipython kernel install --name=python3 --display="Python 3/anaconda3/latest" --prefix=/share/apps/jupyterhub/live/miniconda/ )
 	for mod in $(CONDA_AUTO_KERNELS) ; do ( ml purge ; ml load $$mod ; ipython kernel install --name=`echo $$mod | tr / _` --display="$$mod" --prefix=/share/apps/jupyterhub/live/miniconda/ ) ; done
