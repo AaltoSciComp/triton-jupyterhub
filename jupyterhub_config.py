@@ -3,6 +3,7 @@
 import os
 live = 'DEV' not in os.environ
 dev = 1 if not os.environ.get('DEV', '').isdigit() else int(os.environ['DEV'])
+BASEDIR = os.path.dirname(__file__)
 
 #
 # Connections, ports, config files.
@@ -43,8 +44,8 @@ c.Spawner.http_timeout = 120
 # Slurm options can be found at https://github.com/jupyterhub/batchspawner/blob/master/batchspawner/batchspawner.py#L78
 batch_cmd="""\
 unset XDG_RUNTIME_DIR
-sh /share/apps/jupyterhub/setup_tree.sh
-/share/apps/jupyterhub/live/miniconda/bin/python -E -s /share/apps/jupyterhub/live/miniconda/bin/jupyterhub-singleuser"""
+sh {BASEDIR}/setup_tree.sh
+{BASEDIR}/miniconda/bin/python -E -s {BASEDIR}/miniconda/bin/jupyterhub-singleuser""".format(BASEDIR=BASEDIR)
 slurm_default = dict(req_partition='interactive', req_options='', req_workdir='/scratch/work/{user}',
                      cmd=batch_cmd)
 c.ProfilesSpawner.profiles = [
