@@ -51,6 +51,8 @@ c.ProfilesSpawner.profiles = [
     #("Local process", 'local', 'jupyterhub.spawner.LocalProcessSpawner', dict() ),
     ("Slurm 10h 2G",  'slurm2', 'batchspawner.SlurmSpawner',
          {**slurm_default, **dict(req_partition='jupyter-long', req_memory='2200', req_runtime='0-10')}),
+    ("Slurm 10h 20G", 'slurm3', 'batchspawner.SlurmSpawner',
+         {**slurm_default, **dict(req_partition='jupyter-short', req_memory='10200', req_runtime='0-10')}),
     ("Slurm 5day 2G", 'slurm5', 'batchspawner.SlurmSpawner',
          {**slurm_default, **dict(req_partition='jupyter-long', req_memory='2200', req_runtime='5-0')}),
     ("Slurm 4h 100G", 'slurm8', 'batchspawner.SlurmSpawner',
