@@ -25,8 +25,11 @@ emergency_stop:
 	systemctl restart jupyterhub
 
 
-
-install_all: setup_core 
+# To do full installation:
+# make setup_conda
+# source miniconda/bin/activate
+# then:
+install_all: setup_core extensions_install kernels_auto kernels_manual
 
 setup_conda:
 #	false
