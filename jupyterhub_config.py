@@ -31,7 +31,8 @@ if 'JUPYTER_PERSIST_ACROSS_RESTARTS' in os.environ:
 #
 # Authentication config
 #
-c.Authenticator.admin_users = {'darstr1'}
+import grp
+c.Authenticator.admin_users = set(grp.getgrnam('admin').gr_mem) & set(grp.getgrnam('triton-users').gr_mem)
 c.LocalAuthenticator.group_whitelist = {'triton-users'}
 c.Spawner.disable_user_config = True                 # security-related
 c.JupyterHub.cookie_max_age_days = 3
