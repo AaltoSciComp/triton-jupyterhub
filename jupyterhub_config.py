@@ -14,8 +14,10 @@ c.JupyterHub.hub_ip = '10.10.254.30'  # single-user servers need to be able
 if live:
     #c.JupyterHub.ip = '127.0.0.1'  # default *
     #c.JupyterHub.port = 80000  # default 8000
+    c.JupyterHub.hub_port = 8081  # default but needed because accessed below (in cull_idle)
     c.JupyterHub.cookie_secret_file = '/etc/jupyterhub/jupyterhub_cookie_secret'
     c.JupyterHub.db_url = 'sqlite:////etc/jupyterhub/jupyterhub.sqlite'
+    c.JupyterHub.base_url = '/'   # default but needed because accessed below
 # Dev server settings
 else:
     c.JupyterHub.hub_port = 8081 + dev*200
@@ -79,7 +81,7 @@ c.JupyterHub.services = [
      'command': [sys.executable, os.path.join(BASEDIR, 'cull_idle_servers.py'),
                  '--cull-every=60', '--timeout=600',
                  '--server-db='+c.JupyterHub.db_url.split(':///')[1],
-                 '--url=http://%s:%s%s/hub/api'%(c.JupyterHub.hub_ip, c.JupyterHub.hub_port, c.JupyterHub.base_url)
+                 '--url=http://%s:%s%s/hub/api'%(c.JupyterHub.hub_ip, c.JupyterHub.hub_port, c.JupyterHub.base_url if c.JupyterHub.base_url!='/' else '')
                 ],
     }]
 
