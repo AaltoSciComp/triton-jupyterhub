@@ -60,19 +60,19 @@ def cull_idle(url, api_token, timeout, cull_users=False):
     futures = []
 
     @coroutine
-    def cull_one(user, last_activity):
+    def cull_one(user, last_activity, log_data):
         """cull one user"""
 
         # shutdown server first. Hub doesn't allow deleting users with running servers.
         if user['server']:
-            app_log.info("Culling server for %s (inactive since %s)", user['name'], last_activity)
+            app_log.info("Culling server for %s (inactive since %s: %s)", user['name'], last_activity, log_data)
             req = HTTPRequest(url=url + '/users/%s/server' % user['name'],
                 method='DELETE',
                 headers=auth_header,
             )
             yield client.fetch(req)
         if cull_users:
-            app_log.info("Culling user %s (inactive since %s)", user['name'], last_activity)
+            app_log.info("Culling user %s (inactive since %s: %s)", user['name'], last_activity, log_data)
             req = HTTPRequest(url=url + '/users/%s' % user['name'],
                 method='DELETE',
                 headers=auth_header,
@@ -98,17 +98,20 @@ def cull_idle(url, api_token, timeout, cull_users=False):
 
         # Advanced culling: cull depending on the spawner-specific
         # timeout.  This is specific to the batchspawner, and the
-        # options must have req_culltime defined.  Default zero, which is 
+        # options must have req_culltime defined.  Default zero, which
+        # means do not cull.
         cur = conn.execute('SELECT users.name, spawners.state FROM users LEFT JOIN spawners ON (users.id=spawners.user_id) WHERE users.name=?', (user['name'],))
         username, spawner_data = cur.fetchone()
         spawner_data = json.loads(spawner_data)
         mem = spawner_data['child_conf']['req_memory']
         cull_time = spawner_data['child_conf'].get('req_culltime', 365*24*60)  # default in a long time
-        profile = spawner_data.get('profile', None)
-        print(f"{username}: {total_mem} {mem} {cull_time} {user['last_activity']}")
+        profile = spawner_data.get('profile', None)    # from ProflieSpawner name (second argument)
+        #print(f"{username}: {total_mem} {mem} {cull_time} {user['last_activity']}")
+        # Add extra logic here.
 
-        if last_activity < cull_limit and cull_time != 0 and last_activity < now - datetime.timedelta(seconds=cull_time):
-            futures.append((user['name'], cull_one(user, last_activity)))
+        #if last_activity < cull_limit:
+        if cull_time != 0 and last_activity < now - datetime.timedelta(seconds=cull_time):
+            futures.append((user['name'], cull_one(user, last_activity, dict(profile=profile,cull_time=cull_time, mem=mem))))
         else:
             app_log.debug("Not culling %s (active since %s)", user['name'], last_activity)
 
