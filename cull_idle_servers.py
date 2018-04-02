@@ -119,7 +119,6 @@ def cull_idle(url, api_token, timeout, cull_users=False):
         yield f
         app_log.debug("Finished culling %s", name)
 
-    conn.close() # close sqlite DB
 
 
 if __name__ == '__main__':
