@@ -73,7 +73,8 @@ c.Spawner.notebook_dir = '/scratch/work/{username}/.jupyterhub-tree/'     # visi
 #c.Spawner.default_url = ''
 #c.Spawner.default_url = '/lab'
 #c.Spawner.args = ['--debug', '--profile=PHYS131']  # single-user server args
-
+c.Spawner.poll_interval = 300
+c.JupyterHub.last_activity_interval = 60
 
 c.JupyterHub.services = [
     {'name': "cull-idle-batch",
