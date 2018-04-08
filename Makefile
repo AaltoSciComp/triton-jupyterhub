@@ -33,7 +33,7 @@ install_all: setup_core extensions_install kernels_auto kernels_manual
 
 setup_conda:
 #	false
-	sh ../Miniconda3-latest-Linux-x86_64.sh -p $(PWD)/miniconda -b
+	sh ../Miniconda3-latest-Linux-x86_64.sh -s -p $(PWD)/miniconda -b
 	echo 'Remember to "source miniconda/bin/activate"'
 
 # This is the very first setup that is needed.
