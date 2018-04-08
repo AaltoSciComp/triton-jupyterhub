@@ -102,18 +102,18 @@ extensions_install:
 
 
 # These kernels can be installed automatically: just source anaconda and run this
-CONDA_AUTO_KERNELS=anaconda2/5.1.0-cpu anaconda2/5.1.0-gpu anaconda3/5.1.0-cpu anaconda3/5.1.0-gpu
+CONDA_AUTO_KERNELS=anaconda2/5.1.0-cpu anaconda2/5.1.0-gpu anaconda3/5.1.0-cpu anaconda3/5.1.0-gpu pypy3/5.10.1-py3.5 pypy2/5.10.0-py2.7
 kernels_auto:
+	test ! -z "$(CONDA_PREFIX)"
 #	# Bash
 #	# https://github.com/takluyver/bash_kernel
 	pip install bash_kernel
 	python -m bash_kernel.install --sys-prefix
 
 #	# Various Python kernels
-	test ! -z "$(CONDA_PREFIX)"
-	( ml purge ; ml load anaconda2/latest ; ipython kernel install --name=python2 --display="Python 2/anaconda2/latest" --prefix=$(KERNEL_PREFIX)/miniconda/ )
-	( ml purge ; ml load anaconda3/latest ; ipython kernel install --name=python3 --display="Python 3/anaconda3/latest" --prefix=$(KERNEL_PREFIX)/miniconda/ )
-	for mod in $(CONDA_AUTO_KERNELS) ; do ( ml purge ; ml load $$mod ; ipython kernel install --name=`echo $$mod | tr / _` --display="$$mod" --prefix=$(KERNEL_PREFIX)/miniconda/ ) ; done
+	( ml purge ; ml load anaconda2/latest ; ipython kernel install --name=python2 --display="Python 2/anaconda2/latest" --prefix=$(KERNEL_PREFIX)/ )
+	( ml purge ; ml load anaconda3/latest ; ipython kernel install --name=python3 --display="Python 3/anaconda3/latest" --prefix=$(KERNEL_PREFIX)/ )
+	for mod in $(CONDA_AUTO_KERNELS) ; do ( ml purge ; ml load $$mod ; ipython kernel install --name=`echo $$mod | tr / _` --display="$$mod" --prefix=$(KERNEL_PREFIX)/ ) ; done
 
 	jupyter kernelspec list
 
