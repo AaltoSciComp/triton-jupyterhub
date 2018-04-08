@@ -106,7 +106,7 @@ def cull_idle(url, api_token, timeout, cull_users=False):
         mem = spawner_data['child_conf']['req_memory']
         cull_time = spawner_data['child_conf'].get('req_culltime', 365*24*60)  # default in a long time
         profile = spawner_data.get('profile', None)    # from ProflieSpawner name (second argument)
-        #print(f"{username}: {total_mem} {mem} {cull_time} {user['last_activity']}")
+        app_log.info(f"CULL IDLE: {username}: {total_mem} {mem} {cull_time} {user['last_activity']}")
         # Add extra logic here.
 
         #if last_activity < cull_limit:
