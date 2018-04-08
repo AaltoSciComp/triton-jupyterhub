@@ -60,7 +60,7 @@ c.ProfilesSpawner.profiles = [
     ("Slurm 10h 5G",  'slurm2', 'batchspawner.SlurmSpawner',
          {**slurm_default, **dict(req_partition='jupyter-long', req_memory='5200', req_runtime='0-10')}),
     ("Slurm 10h 20G (timeout after 60 min idle)", 'slurm3', 'batchspawner.SlurmSpawner',
-         {**slurm_default, **dict(req_partition='jupyter-short',req_memory='10200',req_runtime='0-10', req_culltime=60*60+300)}),
+         {**slurm_default, **dict(req_partition='jupyter-short',req_memory='20200',req_runtime='0-10', req_culltime=60*60+300)}),
     ("Slurm 5day 2G", 'slurm5', 'batchspawner.SlurmSpawner',
          {**slurm_default, **dict(req_partition='jupyter-long', req_memory='2200', req_runtime='5-0')}),
     ("Slurm 4h 80G (timeout after 15min idle)", 'slurm8', 'batchspawner.SlurmSpawner',
