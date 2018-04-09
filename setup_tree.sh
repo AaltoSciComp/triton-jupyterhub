@@ -14,4 +14,4 @@ test -e $JHOME/filesystem || ln -sT /        $JHOME/filesystem
 # Make this directory non-modifiable
 chmod u-w,g-w,o-w $JHOME
 # Clean up old spawner logfiles
-find ~/ -maxdepth 1 -regextype egrep -regex '.*jupyterhub_slurmspawner_[0-9]+.log' -mtime 7 -delete
+find ~/ -maxdepth 1 -regextype egrep -regex '.*jupyterhub_slurmspawner_[0-9]+.log' -mtime '+7' -delete
