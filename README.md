@@ -17,7 +17,8 @@ Key dependencies:
 * Batchspawner: https://github.com/jupyterhub/batchspawner
 * Our ansible configuration for cluster deployment (currently minimal
   - deploys system config to CentOS7, but actual configuration is
-  seprately managed.)
+  seprately managed.):
+  https://github.com/AaltoScienceIT/ansible-role-fgci-jupyterhub
 * This repository which contains the actual Jupyterhub configuration
 * User instructions: http://scicomp.aalto.fi/triton/apps/jupyter.html
   (read this to see our vision from a user's perspective)
@@ -125,6 +126,7 @@ It should be re-done once we know where we are going.
 No guarentees about anything.  This may help guide you, but you'll
 need to help generalize.
 
+Please send feedback and contribute.
 
 
 
@@ -144,3 +146,11 @@ need to help generalize.
   workshops.  A bit of integration could make things even easier
   (e.g. spawner which copies the right base files to your working
   dir).
+
+
+
+# Contact
+
+Richard Darst
+[email](https://people.aalto.fi/index.html?language=english#richard_darst),
+Aalto University
