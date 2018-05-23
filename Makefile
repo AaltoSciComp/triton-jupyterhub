@@ -47,8 +47,11 @@ setup_core:
 	git clone https://github.com/jupyterhub/batchspawner
 	pip install -e batchspawner/
 	pip install git+https://github.com/jupyterhub/wrapspawner
+	conda install pycurl  # for cull_idle_servers.py
+	conda install -c conda-forge async_generator  # jupyterhub 0.9, remove later
 
 	conda install notebook # only where it is being run
+	conda install nbconvert
 
 	pip install jupyterlab
 	jupyter serverextension enable --py jupyterlab --sys-prefix
