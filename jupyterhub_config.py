@@ -57,12 +57,22 @@ c.JupyterHub.cookie_max_age_days = 3
 c.JupyterHub.spawner_class = 'wrapspawner.ProfilesSpawner'
 c.Spawner.http_timeout = 120
 # Slurm options can be found at https://github.com/jupyterhub/batchspawner/blob/master/batchspawner/batchspawner.py#L78
-batch_cmd="""\
+prologue = """\
+set -x
+echo $PATH
+unset XDG_RUNTIME_DIR
+sh {BASEDIR}/setup_tree.sh""".format(BASEDIR=BASEDIR)
+cmd = "{BASEDIR}/miniconda/bin/python -E -s {BASEDIR}/miniconda/bin/jupyterhub-singleuser --FileContentsManager.delete_to_trash=False".format(BASEDIR=BASEDIR)
+cmd = """\
+set -x
+echo $PATH
 unset XDG_RUNTIME_DIR
 sh {BASEDIR}/setup_tree.sh
 {BASEDIR}/miniconda/bin/python -E -s {BASEDIR}/miniconda/bin/jupyterhub-singleuser --FileContentsManager.delete_to_trash=False""".format(BASEDIR=BASEDIR)
+
 slurm_default = dict(req_partition='interactive', req_options='', req_workdir='/scratch/work/{user}',
-                     cmd=batch_cmd)
+                     cmd=cmd,
+                     req_prologue=prologue)
 c.ProfilesSpawner.profiles = [
     #("Local process", 'local', 'jupyterhub.spawner.LocalProcessSpawner', dict() ),
     ("Slurm 10h 2G",  'slurm1', 'batchspawner.SlurmSpawner',
