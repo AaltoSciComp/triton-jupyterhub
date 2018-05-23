@@ -63,12 +63,6 @@ echo $PATH
 unset XDG_RUNTIME_DIR
 sh {BASEDIR}/setup_tree.sh""".format(BASEDIR=BASEDIR)
 cmd = "{BASEDIR}/miniconda/bin/python -E -s {BASEDIR}/miniconda/bin/jupyterhub-singleuser --FileContentsManager.delete_to_trash=False".format(BASEDIR=BASEDIR)
-cmd = """\
-set -x
-echo $PATH
-unset XDG_RUNTIME_DIR
-sh {BASEDIR}/setup_tree.sh
-{BASEDIR}/miniconda/bin/python -E -s {BASEDIR}/miniconda/bin/jupyterhub-singleuser --FileContentsManager.delete_to_trash=False""".format(BASEDIR=BASEDIR)
 
 slurm_default = dict(req_partition='interactive', req_options='', req_workdir='/scratch/work/{user}',
                      cmd=cmd,
