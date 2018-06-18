@@ -55,6 +55,7 @@ setup_core:
 
 	pip install jupyterlab
 	jupyter serverextension enable --py jupyterlab --sys-prefix
+	jupyter labextension install @jupyterlab/hub-extension
 
 
 
