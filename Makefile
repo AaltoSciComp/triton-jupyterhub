@@ -102,7 +102,7 @@ extensions_install:
 	pip install jupyter_contrib_nbextensions
 	jupyter contrib nbextension install --sys-prefix
 #	#jupyter nbextension enable [...name...]
-	jupyter nbextension enable varInspector/main --sys-prefix
+#	jupyter nbextension enable varInspector/main --sys-prefix  # Causes random slowdown.
 
 
 # These kernels can be installed automatically: just source anaconda and run this
