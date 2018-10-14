@@ -10,17 +10,28 @@ BASEDIR = os.path.dirname(__file__)
 #
 # Connections, ports, config files.
 #
-c.JupyterHub.hub_ip = '10.10.254.30'  # single-user servers need to be able
+#c.JupyterHub.hub_ip = '127.0.0.1'  # single-user servers need to be able connect using hub_connect_url
 if live:
+    # localhost:8000 = CHP listening
+    # localhost:8001 = CHP API
+    # localhost:8081 = Hub listen
     #c.JupyterHub.ip = '127.0.0.1'  # default *
-    #c.JupyterHub.port = 80000  # default 8000
+    #c.JupyterHub.port = 8000  # default 8000
+    c.JupyterHub.hub_bind_url = "http://127.0.0.1:8081"
+    c.JupyterHub.hub_connect_url="http://jupyter01.int.triton.aalto.fi:80"
     c.JupyterHub.hub_port = 8081  # default but needed because accessed below (in cull_idle)
     c.JupyterHub.cookie_secret_file = '/etc/jupyterhub/jupyterhub_cookie_secret'
     c.JupyterHub.db_url = 'sqlite:////etc/jupyterhub/jupyterhub.sqlite'
     c.JupyterHub.base_url = '/'   # default but needed because accessed below
+    c.ConfigurableHTTPProxy.auth_token = open('/etc/jupyterhub/configurable-http-proxy-token.var').readline().split('=', 1)[1].strip()
+    c.ConfigurableHTTPProxy.api_url = 'http://localhost:8001'
+    c.ConfigurableHTTPProxy.should_start = False
 # Dev server settings
 else:
-    c.JupyterHub.hub_port = 8081 + dev*200
+    c.JupyterHub.bind_url = "http://127.0.0.1:%s"%(8000+dev*200)
+    c.JupyterHub.hub_bind_url = "http://127.0.0.1:%s"%(8081+dev*200)
+    c.JupyterHub.hub_connect_url="http://jupyter01.int.triton.aalto.fi:80"
+    #c.JupyterHub.hub_port = 8081 + dev*200
     c.JupyterHub.port = 8000 + dev*200
     c.ConfigurableHTTPProxy.api_url = 'http://127.0.0.1:%s'%(8001+dev*200)
     c.JupyterHub.cookie_secret_file = '/etc/jupyterhub/jupyterhub_cookie_secret-dev'
@@ -88,6 +99,8 @@ c.Spawner.notebook_dir = '/scratch/work/{username}/.jupyterhub-tree/'     # visi
 #c.Spawner.default_url = '/lab'
 #c.Spawner.args = ['--debug', '--profile=PHYS131']  # single-user server args
 c.Spawner.poll_interval = 300
+c.Spawner.startup_poll_interval = 2
+c.Spawner.start_timeout = 180  # timeout upon startup (slurm queue time)
 c.JupyterHub.last_activity_interval = 60
 
 c.JupyterHub.services = [
