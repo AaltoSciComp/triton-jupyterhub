@@ -10,15 +10,16 @@ BASEDIR = os.path.dirname(__file__)
 #
 # Connections, ports, config files.
 #
-#c.JupyterHub.hub_ip = '127.0.0.1'  # single-user servers need to be able connect using hub_connect_url
+c.JupyterHub.hub_ip = '10.10.254.30'  # single-user servers need to be able connect using hub_connect_url
 if live:
     # localhost:8000 = CHP listening
     # localhost:8001 = CHP API
     # localhost:8081 = Hub listen
-    #c.JupyterHub.ip = '127.0.0.1'  # default *
     #c.JupyterHub.port = 8000  # default 8000
-    c.JupyterHub.hub_bind_url = "http://127.0.0.1:8081"
-    c.JupyterHub.hub_connect_url="http://jupyter01.int.triton.aalto.fi:80"
+    # These were for the internal-loop-connection shibboleth thing
+    #c.JupyterHub.hub_bind_url = "http://127.0.0.1:8081"
+    #c.JupyterHub.hub_connect_url="http://jupyter01.int.triton.aalto.fi:80"   # problem: proxy sends connections to here, which go back to proxy... apache needs to listen on a different port for the hub relay.
+    #
     c.JupyterHub.hub_port = 8081  # default but needed because accessed below (in cull_idle)
     c.JupyterHub.cookie_secret_file = '/etc/jupyterhub/jupyterhub_cookie_secret'
     c.JupyterHub.db_url = 'sqlite:////etc/jupyterhub/jupyterhub.sqlite'
@@ -28,8 +29,8 @@ if live:
     c.ConfigurableHTTPProxy.should_start = False
 # Dev server settings
 else:
-    c.JupyterHub.bind_url = "http://127.0.0.1:%s"%(8000+dev*200)
-    c.JupyterHub.hub_bind_url = "http://127.0.0.1:%s"%(8081+dev*200)
+    #c.JupyterHub.bind_url = "http://127.0.0.1:%s"%(8000+dev*200)
+    #c.JupyterHub.hub_bind_url = "http://127.0.0.1:%s"%(8081+dev*200)
     c.JupyterHub.hub_connect_url="http://jupyter01.int.triton.aalto.fi:80"
     #c.JupyterHub.hub_port = 8081 + dev*200
     c.JupyterHub.port = 8000 + dev*200
