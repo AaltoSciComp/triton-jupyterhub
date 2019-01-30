@@ -91,6 +91,11 @@ extensions_install:
 #	# Notebook diff and merge tools
 	pip install --upgrade nbdime
 	nbdime reg-extensions --sys-prefix
+	jupyter serverextension enable --py nbdime --sys-prefix
+	jupyter nbextension install --py nbdime --sys-prefix
+	jupyter nbextension enable --py nbdime --sys-prefix
+	jupyter labextension link ./packages/nbdime --no-build
+	jupyter labextension install ./packages/labextension
 #	git clone gh:jupyter/nbdime ; pip install nbdime/    # fixes current bug wrt jupyterhub usage in 0.4.1
 
 #	# Lmod integration
@@ -106,6 +111,9 @@ extensions_install:
 #	#jupyter nbextension enable [...name...]
 #	jupyter nbextension enable varInspector/main --sys-prefix  # Causes random slowdown.
 
+	jupyter labextension install @jupyterlab/git
+	pip install --upgrade jupyterlab-git
+	jupyter serverextension enable --py jupyterlab_git
 
 # These kernels can be installed automatically: just source anaconda and run this
 CONDA_AUTO_KERNELS=anaconda2/5.1.0-cpu anaconda2/5.1.0-gpu anaconda3/5.1.0-cpu anaconda3/5.1.0-gpu pypy3/5.10.1-py3.5 pypy2/5.10.0-py2.7
