@@ -30,6 +30,7 @@ emergency_stop:
 # source miniconda/bin/activate
 # then:
 install_all: setup_core extensions_install kernels_auto kernels_manual
+upgrade: setup_core extensions_install
 
 setup_conda:
 #	false
@@ -44,16 +45,17 @@ setup_core:
 #	#
 	test ! -z "$(CONDA_PREFIX)"
 	conda install -c conda-forge jupyterhub
-	git clone https://github.com/jupyterhub/batchspawner
+	test -d batchspawner || git clone https://github.com/jupyterhub/batchspawner
 	pip install -e batchspawner/
-	pip install git+https://github.com/jupyterhub/wrapspawner
+	test -d wrapspawner || git clone https://github.com/jupyterhub/wrapspawner
+	pip install -e wrapspawner
 	conda install pycurl  # for cull_idle_servers.py
 	conda install -c conda-forge async_generator  # jupyterhub 0.9, remove later
 
 	conda install notebook # only where it is being run
 	conda install nbconvert
 
-	pip install jupyterlab
+	pip install --upgrade jupyterlab
 	jupyter serverextension enable --py jupyterlab --sys-prefix
 	jupyter labextension install @jupyterlab/hub-extension
 
@@ -83,23 +85,23 @@ extensions_install:
 	jupyter kernelspec list
 
 #	# Widgets
-	pip install ipywidgets
+	pip install --upgrade ipywidgets
 	jupyter nbextension enable --py widgetsnbextension --sys-prefix
 
 #	# Notebook diff and merge tools
-	pip install nbdime
+	pip install --upgrade nbdime
 	nbdime reg-extensions --sys-prefix
 #	git clone gh:jupyter/nbdime ; pip install nbdime/    # fixes current bug wrt jupyterhub usage in 0.4.1
 
 #	# Lmod integration
 #	# https://github.com/cmd-ntrf/jupyter-lmod
-	pip install jupyterlmod
+	pip install --upgrade jupyterlmod
 	jupyter nbextension install --py jupyterlmod --sys-prefix
 	jupyter nbextension enable jupyterlmod --py --sys-prefix
 	jupyter serverextension enable --py jupyterlmod --sys-prefix
 
 #	# javascript extensions for various things
-	pip install jupyter_contrib_nbextensions
+	pip install --upgrade jupyter_contrib_nbextensions
 	jupyter contrib nbextension install --sys-prefix
 #	#jupyter nbextension enable [...name...]
 #	jupyter nbextension enable varInspector/main --sys-prefix  # Causes random slowdown.
@@ -111,7 +113,7 @@ kernels_auto:
 	test ! -z "$(CONDA_PREFIX)"
 #	# Bash
 #	# https://github.com/takluyver/bash_kernel
-	pip install bash_kernel
+	pip install --upgrade bash_kernel
 	python -m bash_kernel.install --sys-prefix
 
 #	# Various Python kernels
@@ -136,14 +138,14 @@ kernels_manual:
 #	# https://github.com/imatlab/imatlab
 #	# https://se.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
 	cd /share/apps/matlab/R2017b/extern/engines/python/ && python setup.py install
-	pip install imatlab
+	pip install --upgrade imatlab
 	python -mimatlab install --sys-prefix --display-name="Matlab (R2017b,imatlab,better)"
 #	# MANUAL: add "env": {"LD_PRELOAD": "/share/apps/jupyterhub/live/miniconda/lib/libstdc++.so" }
 #       # to /share/apps/jupyterhub/live/miniconda/share/jupyter/kernels/matlab/kernel.json
 
 # 	# MATLAB alternative
 #	alternative but seems worse
-	pip install matlab_kernel
+	pip install --upgrade matlab_kernel
 	LD_PRELOAD="$(PWD)/miniconda/lib/libstdc++.so" python -m matlab_kernel install --sys-prefix
 	cat $(KERNEL_PREFIX)/share/jupyter/kernels/matlab/kernel.json | jq "setpath ([\"env\"]; {LD_PRELOAD: \"$$PWD/miniconda/lib/libstdc++.so\" })" > $(KERNEL_PREFIX)/share/jupyter/kernels/matlab/kernel.json.new
 	mv $(KERNEL_PREFIX)/share/jupyter/kernels/matlab/kernel.json{.new,}
