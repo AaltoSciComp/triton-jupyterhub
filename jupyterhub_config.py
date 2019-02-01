@@ -79,8 +79,10 @@ sh {BASEDIR}/setup_tree.sh""".format(BASEDIR=BASEDIR)
 cmd = "{BASEDIR}/miniconda/bin/python -E -s {BASEDIR}/miniconda/bin/jupyterhub-singleuser --FileContentsManager.delete_to_trash=False".format(BASEDIR=BASEDIR)
 
 slurm_default = dict(req_partition='interactive', req_options='', req_workdir='/scratch/work/{user}',
-                     cmd=cmd,
-                     req_prologue=prologue)
+                     cmd=cmd, req_nprocs='10',
+                     req_prologue=prologue,
+                     #req_srun='srun'
+                     )
 profiles = [
     #("Local process", 'local', 'jupyterhub.spawner.LocalProcessSpawner', dict() ),
     ["Slurm 10h, 2G avg (max 10G)",  'slurm1', 'batchspawner.SlurmSpawner',
