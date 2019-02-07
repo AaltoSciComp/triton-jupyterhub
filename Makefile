@@ -90,12 +90,7 @@ extensions_install:
 
 #	# Notebook diff and merge tools
 	pip install --upgrade nbdime
-	nbdime reg-extensions --sys-prefix
-	jupyter serverextension enable --py nbdime --sys-prefix
-	jupyter nbextension install --py nbdime --sys-prefix
-	jupyter nbextension enable --py nbdime --sys-prefix
-	jupyter labextension link ./packages/nbdime --no-build
-	jupyter labextension install ./packages/labextension
+	nbdime extensions --enable --sys-prefix
 #	git clone gh:jupyter/nbdime ; pip install nbdime/    # fixes current bug wrt jupyterhub usage in 0.4.1
 
 #	# Lmod integration
