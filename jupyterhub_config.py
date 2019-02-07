@@ -50,7 +50,6 @@ if 'JUPYTER_PERSIST_ACROSS_RESTARTS' in os.environ:
 # Allow templating.  TODO: 0.9.0 greatly improves templating.  Redo
 # this to use the super() strategy: https://jupyterhub.readthedocs.io/en/latest/reference/templates.html
 c.JupyterHub.template_paths = [os.path.join(BASEDIR, 'templates'),
-                               os.path.join(BASEDIR, 'miniconda/share/jupyter/hub/templates/')  # required for version <0.9
                               ]
 
 
