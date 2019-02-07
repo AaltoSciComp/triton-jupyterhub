@@ -81,7 +81,7 @@ cmd = "{BASEDIR}/miniconda/bin/python -E -s {BASEDIR}/miniconda/bin/batchspawner
 slurm_default = dict(req_partition='interactive', req_options='', req_workdir='/scratch/work/{user}',
                      cmd=cmd, req_nprocs='2',
                      req_prologue=prologue,
-                     req_srun=''
+                     req_srun='',
                      )
 profiles = [
     #("Local process", 'local', 'jupyterhub.spawner.LocalProcessSpawner', dict() ),
