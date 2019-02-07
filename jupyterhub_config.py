@@ -99,8 +99,11 @@ profiles = [
 profiles_jupyterlab = copy.deepcopy(profiles)
 for row in profiles_jupyterlab:
     row[3]['default_url'] = 'lab'
+    #row[3]['cmd'] = row[3]['cmd'].replace('-singleuser', '-singleuser lab')
 for row in profiles:
+    row[1] = row[1] + 'notebook'
     row[0] = '(classic notebook) ' + row[0]
+    row[3]['default_url'] = 'tree'
 c.ProfilesSpawner.profiles = profiles_jupyterlab + profiles
 # batchspawner needs: sudo -E -u {username}    sbatch  /  squeue -h -j {job_id} -O "%T %B"  /  scancel {job_id}.
 
