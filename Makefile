@@ -97,8 +97,9 @@ extensions_install:
 #	# https://github.com/cmd-ntrf/jupyter-lmod
 	pip install --upgrade jupyterlmod
 	jupyter nbextension install --py jupyterlmod --sys-prefix
-	jupyter nbextension enable jupyterlmod --py --sys-prefix
 	jupyter serverextension enable --py jupyterlmod --sys-prefix
+	jupyter nbextension enable jupyterlmod --py --sys-prefix
+	jupyter labextension install jupyterlab-lmod
 
 #	# javascript extensions for various things
 	pip install --upgrade jupyter_contrib_nbextensions
