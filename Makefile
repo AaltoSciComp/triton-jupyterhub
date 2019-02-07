@@ -131,12 +131,6 @@ kernels_auto:
 
 	jupyter kernelspec list
 
-#	# Rstudio
-	conda install rstudio
-	jupyter serverextension enable  --py --sys-prefix nbrsessionproxy
-	jupyter nbextension     install --py --sys-prefix nbrsessionproxy
-	jupyter nbextension     enable  --py --sys-prefix nbrsessionproxy
-
 
 # Install kernels.  These require manual work so far.
 kernels_manual:
