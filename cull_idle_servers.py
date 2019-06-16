@@ -116,21 +116,11 @@ def cull_idle(
     users = json.loads(resp.body.decode('utf8', 'replace'))
     futures = []
 
-    # Find the total active memory that is being used, by adding up
-    # all running servers.  This could someday be used to record how
-    # much we do.
-    total_mem = 0
-    conn = sqlite3.connect(options.server_db)
-    cur = conn.execute('SELECT state FROM spawners WHERE server_id is not NULL')
-    for active_spawner in cur:
-        state = json.loads(active_spawner[0])
-        mem = state['child_conf']['req_memory']
-        total_mem += int(mem)
-    # END
-
     @coroutine
     def handle_server(user, server_name, server):
         """Handle (maybe) culling a single server
+
+        "server" is the entire server model from the API.
 
         Returns True if server is now stopped (user removable),
         False otherwise.
@@ -174,20 +164,25 @@ def cull_idle(
             # for running servers
             inactive = age
 
-        # TODO: support multiple servers per user.
-        cur = conn.execute('SELECT users.name, spawners.state FROM users LEFT JOIN spawners ON (users.id=spawners.user_id) WHERE users.name=?', (user['name'],))
-        username, spawner_data = cur.fetchone()
-        if spawner_data is None:
-            return True
-        #app_log.debug(f"CULL IDLE: {username}/{server_name}: inactive={inactive} age={age} spawner_data={spawner_data}")
-        spawner_data = json.loads(spawner_data)
-        # if 'child_state' not in spawner_data:
-        #     return True
-        mem = spawner_data['child_conf']['req_memory']
-        cull_time = spawner_data['child_conf'].get('req_culltime', 10*365*24*60)  # seconds, default in a long time
-        profile = spawner_data.get('profile', None)    # from ProflieSpawner name (second argument)
+        # CUSTOM CULLING TEST CODE HERE
+        # Add in additional server tests here.  Return False to mean "don't
+        # cull", True means "cull immediately", or, for example, update some
+        # other variables like inactive_limit.
+        #
+        # Here, server['state'] is the result of the get_state method
+        # on the spawner.  This does *not* contain the below by
+        # default, you may have to modify your spawner to make this
+        # work.
+
+        #if server['state']['profile_name'] == 'unlimited'
+        #    return False
+        #inactive_limit = server['state']['culltime']
+        state = server['state']
+        mem = state['child_conf']['req_memory']
+        profile = state.get('profile', None)    # from ProflieSpawner name (second argument)
+        cull_time = state['child_conf'].get('req_culltime', 10*365*24*60) # default one year or unlimited
         inactive_limit = cull_time
-        #app_log.info(f"CULL IDLE: {username}/{server_name}: {total_mem} {mem} {cull_time} inactive={inactive} inactive_limit={inactive_limit} age={age} last_activity={server['last_activity']}")
+        app_log.info(f"CULL IDLE: {user['name']}/{server_name}: {mem} {cull_time} inactive={inactive} inactive_limit={inactive_limit} age={age} last_activity={server['last_activity']}")
 
         should_cull = (
             inactive is not None and inactive.total_seconds() >= inactive_limit
@@ -355,7 +350,6 @@ if __name__ == '__main__':
         default=0,
         help="The interval (in seconds) for checking for idle servers to cull",
     )
-    define('server_db', help="Jupyterhub DB to use to cull idle servers")
     define(
         'max_age',
         default=0,
