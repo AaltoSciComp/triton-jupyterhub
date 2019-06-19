@@ -1,22 +1,28 @@
+# Automation for setting up JupyterHub on a HPC cluster.
+#
+# This Makefile is a hack, and actually serves the role of a piecewise
+# shell script which does the setup and documents some important
+# management commands.  Not all pieces necessarily work - please
+# understand everything before you run it.
+#
+# The install-related targes *should* mostly work and generally should
+# be general work, and we should try to make them work for others,
+# too.  Install-related targets should be idempotent (but sometimes if
+# re-run, they won't do something that is needed).
 
-default:
-	echo "choose command: run"
-run:
-	jupyterhub -f jupyterhub_config.py
-#	--Class.trait=x   for command line config
 
 # TODO
-# SSL
-# move cookie secret elsewhere
-
-# - handle log files
-# - move sjupyter here
-# - kernels
 
 # document:
 # - proxy
 # - jupyterlab
 # - the .jupyterhub-tree directory
+
+default:
+	@echo "Must specify target to run."
+run:
+	jupyterhub -f jupyterhub_config.py
+#	    --Class.trait=x   for command line config
 
 restart:
 	systemctl stop jupyterhub
@@ -25,10 +31,12 @@ emergency_stop:
 	systemctl restart jupyterhub
 
 
-# To do full installation:
-# make setup_conda
-# source miniconda/bin/activate
-# then:
+# INSTALLATION
+#
+# To do full installation, *first* you must setup miniconda first:
+#     make setup_conda
+#     source miniconda/bin/activate
+# then install_all:
 install_all: setup_core extensions_install kernels_auto kernels_manual
 upgrade: setup_core extensions_install
 
