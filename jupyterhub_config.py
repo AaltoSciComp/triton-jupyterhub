@@ -123,8 +123,8 @@ c.JupyterHub.services = [
     {'name': "cull-idle-batch",
      'admin': True,
      'command': [sys.executable, os.path.join(BASEDIR, 'cull_idle_servers.py'),
-                 '--cull-every=300', '--timeout=600',
-                 '--server-db='+c.JupyterHub.db_url.split(':///')[1],
+                 '--cull-every=30', '--timeout=30',
+                 #'--server-db='+c.JupyterHub.db_url.split(':///')[1],
                  '--url=http://%s:%s%s/hub/api'%(c.JupyterHub.hub_ip, 8081+dev*200, c.JupyterHub.base_url if c.JupyterHub.base_url!='/' else '')
                 ],
     }]
