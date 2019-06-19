@@ -5,7 +5,7 @@ import os
 import sys
 
 live = 'DEV' not in os.environ
-dev = 1 if not os.environ.get('DEV', '').isdigit() else int(os.environ['DEV'])
+dev = 0 if not os.environ.get('DEV', '').isdigit() else int(os.environ['DEV'])
 BASEDIR = os.path.dirname(__file__)
 
 #
