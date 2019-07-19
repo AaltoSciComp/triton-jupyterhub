@@ -69,7 +69,7 @@ c.JupyterHub.cookie_options = dict(secure=True)
 #
 import batchspawner
 c.JupyterHub.spawner_class = 'wrapspawner.ProfilesSpawner'
-c.SlurmSpawner.batchspawner_wrapper='{BASEDIR}/miniconda/bin/batchspawner-singleuser'.format(BASEDIR=BASEDIR)
+c.SlurmSpawner.batchspawner_singleuser_cmd = '{BASEDIR}/miniconda/bin/batchspawner-singleuser'.format(BASEDIR=BASEDIR)
 
 c.Spawner.http_timeout = 120
 # Slurm options can be found at https://github.com/jupyterhub/batchspawner/blob/master/batchspawner/batchspawner.py#L78

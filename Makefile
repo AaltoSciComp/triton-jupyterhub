@@ -65,7 +65,7 @@ setup_core:
 
 	pip install --upgrade jupyterlab
 	jupyter serverextension enable --py jupyterlab --sys-prefix
-	jupyter labextension install @jupyterlab/hub-extension
+#	jupyter labextension install @jupyterlab/hub-extension
 
 
 
@@ -119,19 +119,42 @@ extensions_install:
 	pip install --upgrade jupyterlab-git
 	jupyter serverextension enable --py jupyterlab_git
 
-# These kernels can be installed automatically: just source anaconda and run this
+#	# envkernel - to install kernels in lmod.
+	pip install git+https://github.com/NordicHPC/envkernel
+
+#  These kernels can be installed automatically: just source anaconda and run this
 CONDA_AUTO_KERNELS=anaconda2/5.1.0-cpu anaconda2/5.1.0-gpu anaconda3/5.1.0-cpu anaconda3/5.1.0-gpu pypy3/5.10.1-py3.5 pypy2/5.10.0-py2.7
+
 kernels_auto:
 	test ! -z "$(CONDA_PREFIX)"
+
 #	# Bash
 #	# https://github.com/takluyver/bash_kernel
 	pip install --upgrade bash_kernel
 	python -m bash_kernel.install --sys-prefix
 
 #	# Various Python kernels
-	( ml purge ; ml load anaconda2/latest ; ipython kernel install --name=python2 --display="Python 2/anaconda2/latest" --prefix=$(KERNEL_PREFIX)/ )
-	( ml purge ; ml load anaconda3/latest ; ipython kernel install --name=python3 --display="Python 3/anaconda3/latest" --prefix=$(KERNEL_PREFIX)/ )
-	for mod in $(CONDA_AUTO_KERNELS) ; do ( ml purge ; ml load $$mod ; ipython kernel install --name=`echo $$mod | tr / _` --display="$$mod" --prefix=$(KERNEL_PREFIX)/ ) ; done
+	( ml purge ; ml load anaconda2/latest ; ipython kernel install --name=python2 --prefix=$(KERNEL_PREFIX) )
+	( ml purge ; ml load anaconda3/latest ; ipython kernel install --name=python3 --prefix=$(KERNEL_PREFIX) )
+	envkernel lmod --name=python2 --kernel-template=python2 anaconda2/latest --display-name="Python 2/anaconda2/latest" --prefix=$(KERNEL_PREFIX)
+	envkernel lmod --name=python3 --kernel-template=python3 anaconda3/latest --display-name="Python 3/anaconda3/latest" --prefix=$(KERNEL_PREFIX)
+
+#	# Automatic kernels, everything in the list above.
+	for mod in $(CONDA_AUTO_KERNELS) ; do \
+		( ml purge ; ml load $$mod ; ipython kernel install --name=`echo $$mod | tr / _` --display-name="$$mod" --prefix=$(KERNEL_PREFIX) ; ) ; \
+		envkernel lmod --name=`echo $$mod | tr / _` --kernel-template=`echo $$mod | tr / _` --prefix=$(KERNEL_PREFIX) $$mod  ; \
+	done
+
+#	# Matlab (imatlab, not using older matlab_kernel any more).
+	cd /share/apps/matlab/R2019a/extern/engines/python/ && python setup.py install
+	pip install --upgrade imatlab
+	python -m imatlab install --sys-prefix --name=imatlab --display-name="Matlab r2019a"
+	envkernel lmod --name=imatlab --kernel-template=imatlab --sys-prefix --env=LD_PRELOAD=/share/apps/jupyterhub/live/miniconda/lib/libstdc++.so matlab/r2019a
+
+#	Doesn't work yet - needs kernel.js to be copied from template dir...
+#	( ml load r-triton ; Rscript -e 'IRkernel::installspec(user = FALSE)' )
+#	#envkernel lmod --name=ir --kernel=ir --sys-prefix r-triton --display-name="R"
+#	#envkernel lmod --name=ir-safe --kernel=ir --purge --sys-prefix r-triton --display-name="R (safe)"
 
 	jupyter kernelspec list
 
@@ -139,22 +162,6 @@ kernels_auto:
 # Install kernels.  These require manual work so far.
 kernels_manual:
 	test ! -z "$(CONDA_PREFIX)"
-
-#	# MATLAB
-#	# https://github.com/imatlab/imatlab
-#	# https://se.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
-	cd /share/apps/matlab/R2017b/extern/engines/python/ && python setup.py install
-	pip install --upgrade imatlab
-	python -mimatlab install --sys-prefix --display-name="Matlab (R2017b,imatlab,better)"
-#	# MANUAL: add "env": {"LD_PRELOAD": "/share/apps/jupyterhub/live/miniconda/lib/libstdc++.so" }
-#       # to /share/apps/jupyterhub/live/miniconda/share/jupyter/kernels/matlab/kernel.json
-
-# 	# MATLAB alternative
-#	alternative but seems worse
-	pip install --upgrade matlab_kernel
-	LD_PRELOAD="$(PWD)/miniconda/lib/libstdc++.so" python -m matlab_kernel install --sys-prefix
-	cat $(KERNEL_PREFIX)/share/jupyter/kernels/matlab/kernel.json | jq "setpath ([\"env\"]; {LD_PRELOAD: \"$$PWD/miniconda/lib/libstdc++.so\" })" > $(KERNEL_PREFIX)/share/jupyter/kernels/matlab/kernel.json.new
-	mv $(KERNEL_PREFIX)/share/jupyter/kernels/matlab/kernel.json{.new,}
 
 #	# R
 #	# https://irkernel.github.io/installation/
