@@ -119,6 +119,11 @@ extensions_install:
 	pip install --upgrade jupyterlab-git
 	jupyter serverextension enable --py jupyterlab_git
 
+#	# Jupytext - text-based formats for notebooks
+	conda install -c conda-forge jupytext
+
+	jupyter lab build
+
 #	# envkernel - to install kernels in lmod.
 	pip install git+https://github.com/NordicHPC/envkernel
 
