@@ -144,7 +144,7 @@ extensions_install:
 	pip install git+https://github.com/NordicHPC/envkernel
 
 #  These kernels can be installed automatically: just source anaconda and run this
-CONDA_AUTO_KERNELS=anaconda2/5.1.0-cpu anaconda3/5.1.0-cpu pypy3/5.10.1-py3.5 pypy2/5.10.0-py2.7
+CONDA_AUTO_KERNELS=pypy3/5.10.1-py3.5 pypy2/5.10.0-py2.7
 
 kernels_auto:
 	test ! -z "$(CONDA_PREFIX)"
@@ -155,10 +155,12 @@ kernels_auto:
 	python -m bash_kernel.install --sys-prefix
 
 #	# Various Python kernels
+	( ml purge ; ml load anaconda ; ipython kernel install --name=python3 --prefix=$(KERNEL_PREFIX) )
 	( ml purge ; ml load anaconda2/latest ; ipython kernel install --name=python2 --prefix=$(KERNEL_PREFIX) )
-	( ml purge ; ml load anaconda3/latest ; ipython kernel install --name=python3 --prefix=$(KERNEL_PREFIX) )
-	envkernel lmod --name=python2 --kernel-template=python2 anaconda2/latest --display-name="Python 2/anaconda2/latest" --prefix=$(KERNEL_PREFIX)
-	envkernel lmod --name=python3 --kernel-template=python3 anaconda3/latest --display-name="Python 3/anaconda3/latest" --prefix=$(KERNEL_PREFIX)
+	( ml purge ; ml load anaconda3/latest ; ipython kernel install --name=python3-old --prefix=$(KERNEL_PREFIX) )
+	envkernel lmod --name=python3 --kernel-template=python3 anaconda3/latest --display-name="Python 3/anaconda" --prefix=$(KERNEL_PREFIX)
+	envkernel lmod --name=python2 --kernel-template=python2 anaconda2/latest --display-name="(old) Python 2/anaconda2/latest" --prefix=$(KERNEL_PREFIX)
+	envkernel lmod --name=python3-old --kernel-template=python3-old anaconda3/latest --display-name="(old) Python 3/anaconda3/latest" --prefix=$(KERNEL_PREFIX)
 
 #	# Automatic kernels, everything in the list above.
 	for mod in $(CONDA_AUTO_KERNELS) ; do \
