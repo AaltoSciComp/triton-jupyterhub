@@ -120,7 +120,7 @@ extensions_install:
 #	#jupyter nbextension enable [...name...]
 #	jupyter nbextension enable varInspector/main --sys-prefix  # Causes random slowdown.
 
-	jupyter labextension install @jupyterlab/git
+	jupyter labextension install @jupyterlab/git --no-build
 	pip install --upgrade jupyterlab-git
 	jupyter serverextension enable --py jupyterlab_git
 
@@ -129,14 +129,14 @@ extensions_install:
 
 #	# Jupyterlab-slurm (not at 1.0 yet)
 	pip install jupyterlab_slurm
-	jupyter labextension install jupyterlab-slurm
+	jupyter labextension install jupyterlab-slurm --no-build
 
 #	jupyter-matplotlib
-	jupyter labextension install jupyter-matplotlib
+	jupyter labextension install jupyter-matplotlib --no-build
 
 # 	Recents and favorites
-	jupyter labextension install jupyterlab-recents
-	jupyter labextension install jupyterlab-favorites
+	jupyter labextension install jupyterlab-recents --no-build
+	jupyter labextension install jupyterlab-favorites --no-build
 
 	jupyter lab build
 
