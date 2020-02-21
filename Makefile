@@ -95,6 +95,7 @@ extensions_install:
 #	# Widgets
 	pip install --upgrade ipywidgets
 	jupyter nbextension enable --py widgetsnbextension --sys-prefix
+	jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
 #	# Notebook diff and merge tools
 	pip install --upgrade nbdime
