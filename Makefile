@@ -183,6 +183,7 @@ kernels_auto:
 	envkernel lmod --name=ir2 --kernel=ir --sys-prefix r-triton --display-name="R"
 	envkernel lmod --name=ir2-safe --kernel=ir --purge --sys-prefix r-triton --display-name="R (safe)"
 
+	chmod -R a+rX $(CONDA_PREFIX)/share/jupyter/kernels/
 	jupyter kernelspec list
 
 
