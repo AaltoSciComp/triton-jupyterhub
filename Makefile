@@ -128,9 +128,15 @@ extensions_install:
 	conda install -c conda-forge jupytext
 
 #	# Jupyterlab-slurm (not at 1.0 yet)
-#	pip install jupyterlab_slurm
-#	jupyter labextension install jupyterlab-slurm
+	pip install jupyterlab_slurm
+	jupyter labextension install jupyterlab-slurm
 
+#	jupyter-matplotlib
+	jupyter labextension install jupyter-matplotlib
+
+# 	Recents and favorites
+	jupyter labextension install jupyterlab-recents
+	jupyter labextension install jupyterlab-favorites
 
 	jupyter lab build
 
