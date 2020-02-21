@@ -76,6 +76,7 @@ c.Spawner.http_timeout = 120
 # Slurm options can be found at https://github.com/jupyterhub/batchspawner/blob/master/batchspawner/batchspawner.py#L78
 prologue = """\
 set -x
+PATH=$PATH:{CONDA_PREFIX}/bin-minimal
 echo $PATH
 unset XDG_RUNTIME_DIR
 sh {BASEDIR}/setup_tree.sh""".format(BASEDIR=BASEDIR)
