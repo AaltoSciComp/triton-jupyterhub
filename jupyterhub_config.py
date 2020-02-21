@@ -32,13 +32,14 @@ if live:
 else:
     #c.JupyterHub.bind_url = "http://127.0.0.1:%s"%(8000+dev*200)
     #c.JupyterHub.hub_bind_url = "http://127.0.0.1:%s"%(8081+dev*200)
-    c.JupyterHub.hub_connect_url="http://jupyter01.int.triton.aalto.fi:80"
-    #c.JupyterHub.hub_port = 8081 + dev*200
+    #c.JupyterHub.hub_connect_url="http://jupyter01.int.triton.aalto.fi:80"
+    c.JupyterHub.hub_port = 8081 + dev*200
     c.JupyterHub.port = 8000 + dev*200
     c.ConfigurableHTTPProxy.api_url = 'http://127.0.0.1:%s'%(8001+dev*200)
     c.JupyterHub.cookie_secret_file = '/etc/jupyterhub/jupyterhub_cookie_secret-dev'
     c.JupyterHub.db_url = 'sqlite:////etc/jupyterhub/jupyterhub-dev.sqlite'
     c.JupyterHub.base_url = '/dev'
+    #c.JupyterHub.subdomain_host = 'https://user.jupyter.triton.aalto.fi'   # Enable for subdomains
 
 # Prevents servers from being killed
 if 'JUPYTER_PERSIST_ACROSS_RESTARTS' in os.environ:

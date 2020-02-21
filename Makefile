@@ -9,7 +9,8 @@
 # be general work, and we should try to make them work for others,
 # too.  Install-related targets should be idempotent (but sometimes if
 # re-run, they won't do something that is needed).
-
+#
+# Dev run: sudo -u jupyterhub-daemon /bin/bash -c ". miniconda/bin/activate; DEV=1 jupyterhub -f jupyterhub_config.py"
 
 # TODO
 
@@ -17,6 +18,8 @@
 # - proxy
 # - jupyterlab
 # - the .jupyterhub-tree directory
+
+
 
 default:
 	@echo "Must specify target to run."
