@@ -52,7 +52,7 @@ setup_core:
 #	source activate $PWD/miniconda
 #	#
 	test ! -z "$(CONDA_PREFIX)"
-	conda install -c conda-forge jupyterhub
+	conda install -c conda-forge jupyterhub conda
 	test -d batchspawner || git clone https://github.com/jupyterhub/batchspawner
 	pip install -e batchspawner/
 	test -d wrapspawner || git clone https://github.com/jupyterhub/wrapspawner
