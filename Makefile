@@ -70,6 +70,10 @@ setup_core:
 	jupyter serverextension enable --py jupyterlab --sys-prefix
 #	jupyter labextension install @jupyterlab/hub-extension
 
+#	# Make a directory with only node in it - so that users can
+#	# manage extensions themselves.
+	mkdir -p $(CONDA_PREFIX)/bin-minimal
+	ln -s ../bin/node $(CONDA_PREFIX)/bin-minimal/node
 
 
 # Done on the management node.
