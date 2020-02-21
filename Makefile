@@ -163,10 +163,10 @@ kernels_auto:
 	python -m imatlab install --sys-prefix --name=imatlab --display-name="Matlab r2019a"
 	envkernel lmod --name=imatlab --kernel-template=imatlab --sys-prefix --env=LD_PRELOAD=/share/apps/jupyterhub/live/miniconda/lib/libstdc++.so matlab/r2019a
 
-#	Doesn't work yet - needs kernel.js to be copied from template dir...
-#	( ml load r-triton ; Rscript -e 'IRkernel::installspec(user = FALSE)' )
-#	#envkernel lmod --name=ir --kernel=ir --sys-prefix r-triton --display-name="R"
-#	#envkernel lmod --name=ir-safe --kernel=ir --purge --sys-prefix r-triton --display-name="R (safe)"
+#	IRkernel needs to be updated
+	( ml load r-triton ; Rscript -e 'IRkernel::installspec(user = FALSE)' )
+	envkernel lmod --name=ir2 --kernel=ir --sys-prefix r-triton --display-name="R"
+	envkernel lmod --name=ir2-safe --kernel=ir --purge --sys-prefix r-triton --display-name="R (safe)"
 
 	jupyter kernelspec list
 
