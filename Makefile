@@ -124,13 +124,18 @@ extensions_install:
 #	# Jupytext - text-based formats for notebooks
 	conda install -c conda-forge jupytext
 
+#	# Jupyterlab-slurm (not at 1.0 yet)
+#	pip install jupyterlab_slurm
+#	jupyter labextension install jupyterlab-slurm
+
+
 	jupyter lab build
 
 #	# envkernel - to install kernels in lmod.
 	pip install git+https://github.com/NordicHPC/envkernel
 
 #  These kernels can be installed automatically: just source anaconda and run this
-CONDA_AUTO_KERNELS=anaconda2/5.1.0-cpu anaconda2/5.1.0-gpu anaconda3/5.1.0-cpu anaconda3/5.1.0-gpu pypy3/5.10.1-py3.5 pypy2/5.10.0-py2.7
+CONDA_AUTO_KERNELS=anaconda2/5.1.0-cpu anaconda3/5.1.0-cpu pypy3/5.10.1-py3.5 pypy2/5.10.0-py2.7
 
 kernels_auto:
 	test ! -z "$(CONDA_PREFIX)"
