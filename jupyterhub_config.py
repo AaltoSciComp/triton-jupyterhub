@@ -79,7 +79,7 @@ set -x
 PATH=$PATH:{CONDA_PREFIX}/bin-minimal
 echo $PATH
 unset XDG_RUNTIME_DIR
-sh {BASEDIR}/setup_tree.sh""".format(BASEDIR=BASEDIR)
+sh {BASEDIR}/setup_tree.sh""".format(BASEDIR=BASEDIR, CONDA_PREFIX=os.environ['CONDA_PREFIX'])
 cmd = "{BASEDIR}/miniconda/bin/jupyterhub-singleuser --FileContentsManager.delete_to_trash=False".format(BASEDIR=BASEDIR)
 
 slurm_default = dict(req_partition='interactive', req_options='', req_workdir='/scratch/work/{user}',
