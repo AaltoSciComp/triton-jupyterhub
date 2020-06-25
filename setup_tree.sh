@@ -2,7 +2,7 @@
 
 WRKDIR=/scratch/work/$USER
 # Create Jupyter home tree
-JHOME=$WRKDIR/.jupyterhub-tree
+JHOME=$HOME/.jupyterhub-tree
 mkdir -p $JHOME
 chmod u+w $JHOME
 # Add some useful links
