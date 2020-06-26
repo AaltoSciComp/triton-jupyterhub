@@ -162,14 +162,14 @@ kernels_auto:
 	( ml purge ; ml load anaconda ; ipython kernel install --name=python3 --prefix=$(KERNEL_PREFIX) )
 #	#( ml purge ; ml load anaconda2/latest ; ipython kernel install --name=python2 --prefix=$(KERNEL_PREFIX) )
 	( ml purge ; ml load anaconda3/latest ; ipython kernel install --name=python3-old --prefix=$(KERNEL_PREFIX) )
-	envkernel lmod --name=python3 --kernel-template=python3 anaconda/latest --display-name="Python 3/anaconda" --prefix=$(KERNEL_PREFIX)
+	envkernel lmod --name=python3 --kernel-template=python3 --kernel-make-path-relative anaconda/latest --display-name="Python 3/anaconda" --prefix=$(KERNEL_PREFIX)
 #	envkernel lmod --name=python2 --kernel-template=python2 anaconda2/latest --display-name="(old) Python 2/anaconda2/latest" --prefix=$(KERNEL_PREFIX)
-	envkernel lmod --name=python3-old --kernel-template=python3-old anaconda3/latest --display-name="(old) Python 3/anaconda3/latest" --prefix=$(KERNEL_PREFIX)
+	envkernel lmod --name=python3-old --kernel-template=python3-old --kernel-make-path-relative anaconda3/latest --display-name="(old) Python 3/anaconda3/latest" --prefix=$(KERNEL_PREFIX)
 
 #	# Automatic kernels, everything in the list above.
 	for mod in $(CONDA_AUTO_KERNELS) ; do \
 		( ml purge ; ml load $$mod ; ipython kernel install --name=`echo $$mod | tr / _` --display-name="$$mod" --prefix=$(KERNEL_PREFIX) ; ) ; \
-		envkernel lmod --name=`echo $$mod | tr / _` --kernel-template=`echo $$mod | tr / _` --prefix=$(KERNEL_PREFIX) $$mod  ; \
+		envkernel lmod --name=`echo $$mod | tr / _` --kernel-template=`echo $$mod | tr / _` --kernel-make-path-relative --prefix=$(KERNEL_PREFIX) $$mod  ; \
 	done
 
 #	# Matlab (imatlab, not using older matlab_kernel any more).
@@ -179,10 +179,10 @@ kernels_auto:
 	envkernel lmod --name=imatlab --kernel-template=imatlab --sys-prefix --env=LD_PRELOAD=/share/apps/jupyterhub/live/miniconda/lib/libstdc++.so matlab/r2019a
 
 #	IRkernel needs to be updated
-	( ml load r-irkernel/1.1-python3 ; Rscript -e 'IRkernel::installspec(user = FALSE)' )
-	envkernel lmod --name=ir      --kernel-template=ir              --sys-prefix r-irkernel/1.1-python3 --display-name="R"
-	( ml load r-irkernel/1.1-python3 ; Rscript -e 'IRkernel::installspec(user = FALSE, name="ir-safe")' )
-	envkernel lmod --name=ir-safe --kernel-template=ir-safe --purge --sys-prefix r-irkernel/1.1-python3 --display-name="R (safe)"
+	( ml load r-irkernel/1.1-python3 ; Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)')" )
+	envkernel lmod --name=ir      --kernel-template=ir      --kernel-make-path-relative         --sys-prefix r-irkernel/1.1-python3 --display-name="R"
+	( ml load r-irkernel/1.1-python3 ; Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir-safe')" )
+	envkernel lmod --name=ir-safe --kernel-template=ir-safe --kernel-make-path-relative --purge --sys-prefix r-irkernel/1.1-python3 --display-name="R (safe)"
 
 	chmod -R a+rX $(CONDA_PREFIX)/share/jupyter/kernels/
 	jupyter kernelspec list
