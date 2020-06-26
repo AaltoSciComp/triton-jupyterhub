@@ -162,7 +162,7 @@ kernels_auto:
 	( ml purge ; ml load anaconda ; ipython kernel install --name=python3 --prefix=$(KERNEL_PREFIX) )
 #	#( ml purge ; ml load anaconda2/latest ; ipython kernel install --name=python2 --prefix=$(KERNEL_PREFIX) )
 	( ml purge ; ml load anaconda3/latest ; ipython kernel install --name=python3-old --prefix=$(KERNEL_PREFIX) )
-	envkernel lmod --name=python3 --kernel-template=python3 --kernel-make-path-relative anaconda/latest --display-name="Python 3/anaconda" --prefix=$(KERNEL_PREFIX)
+	envkernel lmod --name=python3 --kernel-template=python3 --kernel-make-path-relative anaconda --display-name="Python 3/anaconda" --prefix=$(KERNEL_PREFIX)
 #	envkernel lmod --name=python2 --kernel-template=python2 anaconda2/latest --display-name="(old) Python 2/anaconda2/latest" --prefix=$(KERNEL_PREFIX)
 	envkernel lmod --name=python3-old --kernel-template=python3-old --kernel-make-path-relative anaconda3/latest --display-name="(old) Python 3/anaconda3/latest" --prefix=$(KERNEL_PREFIX)
 
