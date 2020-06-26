@@ -179,9 +179,10 @@ kernels_auto:
 	envkernel lmod --name=imatlab --kernel-template=imatlab --sys-prefix --env=LD_PRELOAD=/share/apps/jupyterhub/live/miniconda/lib/libstdc++.so matlab/r2019a
 
 #	IRkernel needs to be updated
-	( ml load r-triton ; Rscript -e 'IRkernel::installspec(user = FALSE)' )
-	envkernel lmod --name=ir2 --kernel=ir --sys-prefix r-triton --display-name="R"
-	envkernel lmod --name=ir2-safe --kernel=ir --purge --sys-prefix r-triton --display-name="R (safe)"
+	( ml load r-irkernel/1.1-python3 ; Rscript -e 'IRkernel::installspec(user = FALSE)' )
+	envkernel lmod --name=ir      --kernel-template=ir              --sys-prefix r-irkernel/1.1-python3 --display-name="R"
+	( ml load r-irkernel/1.1-python3 ; Rscript -e 'IRkernel::installspec(user = FALSE, name="ir-safe")' )
+	envkernel lmod --name=ir-safe --kernel-template=ir-safe --purge --sys-prefix r-irkernel/1.1-python3 --display-name="R (safe)"
 
 	chmod -R a+rX $(CONDA_PREFIX)/share/jupyter/kernels/
 	jupyter kernelspec list
