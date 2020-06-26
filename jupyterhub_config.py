@@ -79,6 +79,11 @@ set -x
 PATH=$PATH:{CONDA_PREFIX}/bin-minimal
 echo $PATH
 unset XDG_RUNTIME_DIR
+if [ -d "$HOME"/.jupyterlab-dir ] ; then
+    export JUPYTERLAB_DIR="$HOME"/.jupyterlab-dir
+    echo Using custom jupyterlab dir "$HOME"/.jupyterlab-dir:
+    echo you are responsible for building assets.
+fi
 sh {BASEDIR}/setup_tree.sh""".format(BASEDIR=BASEDIR, CONDA_PREFIX=os.environ['CONDA_PREFIX'])
 cmd = "{BASEDIR}/miniconda/bin/jupyterhub-singleuser --FileContentsManager.delete_to_trash=False".format(BASEDIR=BASEDIR)
 
