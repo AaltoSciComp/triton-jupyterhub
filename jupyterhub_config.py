@@ -112,7 +112,7 @@ c.ProfilesSpawner.profiles = profiles_jupyterlab + profiles
 # batchspawner needs: sudo -E -u {username}    sbatch  /  squeue -h -j {job_id} -O "%T %B"  /  scancel {job_id}.
 
 #c.Spawner.notebook_dir = '/'                     # visible filesystem tree
-c.Spawner.notebook_dir = '/scratch/work/{username}/.jupyterhub-tree/'     # visible filesystem tree
+c.Spawner.notebook_dir = '~/.jupyterhub-tree/'     # visible filesystem tree
 #c.Spawner.default_url = ''
 #c.Spawner.default_url = '/lab'
 #c.Spawner.args = ['--debug', '--profile=PHYS131']  # single-user server args
