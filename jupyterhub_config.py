@@ -75,6 +75,7 @@ c.SlurmSpawner.batchspawner_singleuser_cmd = '{BASEDIR}/miniconda/bin/batchspawn
 c.Spawner.http_timeout = 120
 # Slurm options can be found at https://github.com/jupyterhub/batchspawner/blob/master/batchspawner/batchspawner.py#L78
 prologue = """\
+set +euo pipefail
 set -x
 PATH=$PATH:{CONDA_PREFIX}/bin-minimal
 echo $PATH
