@@ -73,7 +73,7 @@ setup_core:
 #	# Make a directory with only node in it - so that users can
 #	# manage extensions themselves.
 	mkdir -p $(CONDA_PREFIX)/bin-minimal
-	ln -s ../bin/node $(CONDA_PREFIX)/bin-minimal/node
+	ln -fs ../bin/node $(CONDA_PREFIX)/bin-minimal/node
 
 
 # Done on the management node.
