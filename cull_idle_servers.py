@@ -23,7 +23,7 @@ You can run this as a service managed by JupyterHub with this in your config::
 Or run it manually by generating an API token and storing it in `JUPYTERHUB_API_TOKEN`:
 
     export JUPYTERHUB_API_TOKEN=$(jupyterhub token)
-    python3 cull_idle_servers.py [--timeout=900] [--url=http://127.0.0.1:8081/hub/api]
+    python3 cull_idle_servers.py [--timeout=900] [--url=http://localhost:8081/hub/api]
 
 This script uses the same ``--timeout`` and ``--max-age`` values for
 culling users and users' servers.  If you want a different value for
@@ -61,7 +61,7 @@ def parse_date(date_string):
     """
     dt = dateutil.parser.parse(date_string)
     if not dt.tzinfo:
-        # assume naïve timestamps are UTC
+        # assume naive timestamps are UTC
         dt = dt.replace(tzinfo=timezone.utc)
     return dt
 
@@ -86,7 +86,13 @@ def format_td(td):
 
 @coroutine
 def cull_idle(
-    url, api_token, inactive_limit, cull_users=False, max_age=0, concurrency=10
+    url,
+    api_token,
+    inactive_limit,
+    cull_users=False,
+    remove_named_servers=False,
+    max_age=0,
+    concurrency=10
 ):
     """Shutdown idle single-user servers
 
@@ -117,7 +123,7 @@ def cull_idle(
     futures = []
 
     @coroutine
-    def handle_server(user, server_name, server):
+    def handle_server(user, server_name, server, max_age, inactive_limit):
         """Handle (maybe) culling a single server
 
         "server" is the entire server model from the API.
@@ -172,17 +178,20 @@ def cull_idle(
         # Here, server['state'] is the result of the get_state method
         # on the spawner.  This does *not* contain the below by
         # default, you may have to modify your spawner to make this
-        # work.
-
-        #if server['state']['profile_name'] == 'unlimited'
-        #    return False
-        #inactive_limit = server['state']['culltime']
+        # work.  The `user` variable is the user model from the API.
+        #
+        # if server['state']['profile_name'] == 'unlimited'
+        #     return False
+        # inactive_limit = server['state']['culltime']
         state = server['state']
-        mem = state['child_conf']['req_memory']
-        profile = state.get('profile', None)    # from ProflieSpawner name (second argument)
-        cull_time = state['child_conf'].get('req_culltime', 10*365*24*60) # default one year or unlimited
-        inactive_limit = cull_time
-        app_log.info(f"CULL IDLE: {user['name']}/{server_name}: {mem} {cull_time} inactive={inactive} inactive_limit={inactive_limit} age={age} last_activity={server['last_activity']}")
+        # Support getting state from wrapspawer child's conf.
+        if 'child_conf' in state:
+            state = state['child_conf']
+        if 'cull_max_age' in state:
+            max_age = max(max_age, state['cull_max_age'])
+        if 'cull_inactive_time' in state:
+            inactive_limit = max(inactive_limit, state['cull_inactive_time'])
+        app_log.info(f"CULL IDLE: {user['name']}/{server_name}: {max_age} inactive={inactive} inactive_limit={inactive_limit} age={age} last_activity={server['last_activity']}")
 
         should_cull = (
             inactive is not None and inactive.total_seconds() >= inactive_limit
@@ -214,16 +223,29 @@ def cull_idle(
             )
             return False
 
+        body = None
         if server_name:
             # culling a named server
+            # A named server can be stopped and kept available to the user
+            # for starting again or stopped and removed. To remove the named
+            # server we have to pass an additional option in the body of our
+            # DELETE request.
             delete_url = url + "/users/%s/servers/%s" % (
                 quote(user['name']),
                 quote(server['name']),
             )
+            if remove_named_servers:
+                body = json.dumps({"remove": True})
         else:
             delete_url = url + '/users/%s/server' % quote(user['name'])
 
-        req = HTTPRequest(url=delete_url, method='DELETE', headers=auth_header)
+        req = HTTPRequest(
+            url=delete_url,
+            method='DELETE',
+            headers=auth_header,
+            body=body,
+            allow_nonstandard_methods=True
+        )
         resp = yield fetch(req)
         if resp.code == 202:
             app_log.warning("Server %s is slow to stop", log_name)
@@ -258,7 +280,7 @@ def cull_idle(
                     'url': user['server'],
                 }
         server_futures = [
-            handle_server(user, server_name, server)
+            handle_server(user, server_name, server, max_age, inactive_limit)
             for server_name, server in servers.items()
         ]
         results = yield multi(server_futures)
@@ -338,31 +360,47 @@ def cull_idle(
                 app_log.debug("Finished culling %s", name)
 
 
-if __name__ == '__main__':
+def main():
     define(
         'url',
         default=os.environ.get('JUPYTERHUB_API_URL'),
         help="The JupyterHub API URL",
     )
-    define('timeout', default=600, help="The idle timeout (in seconds)")
+    define(
+        'timeout',
+        type=int,
+        default=600,
+        help="The idle timeout (in seconds)"
+    )
     define(
         'cull_every',
+        type=int,
         default=0,
         help="The interval (in seconds) for checking for idle servers to cull",
     )
     define(
         'max_age',
+        type=int,
         default=0,
         help="The maximum age (in seconds) of servers that should be culled even if they are active",
     )
     define(
         'cull_users',
+        type=bool,
         default=False,
         help="""Cull users in addition to servers.
                 This is for use in temporary-user cases such as tmpnb.""",
     )
     define(
+        'remove_named_servers',
+        default=False,
+        type=bool,
+        help="""Remove named servers in addition to stopping them.
+            This is useful for a BinderHub that uses authentication and named servers.""",
+    )
+    define(
         'concurrency',
+        type=int,
         default=10,
         help="""Limit the number of concurrent requests made to the Hub.
 
@@ -392,6 +430,7 @@ if __name__ == '__main__':
         api_token=api_token,
         inactive_limit=options.timeout,
         cull_users=options.cull_users,
+        remove_named_servers=options.remove_named_servers,
         max_age=options.max_age,
         concurrency=options.concurrency,
     )
@@ -405,3 +444,6 @@ if __name__ == '__main__':
         loop.start()
     except KeyboardInterrupt:
         pass
+
+if __name__ == '__main__':
+    main()
