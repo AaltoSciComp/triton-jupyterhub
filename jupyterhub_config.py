@@ -109,7 +109,8 @@ profiles = [
 profiles_jupyterlab = copy.deepcopy(profiles)
 for row in profiles_jupyterlab:
     row[3]['default_url'] = 'lab'
-    row[3]['cmd'] = row[3]['cmd'].replace('jupyterhub-singleuser', 'jupyter-labhub')
+    # This is no longer needed with jupyterlab 2.0:
+    #row[3]['cmd'] = row[3]['cmd'].replace('jupyterhub-singleuser', 'jupyter-labhub')
 for row in profiles:
     row[1] = row[1] + 'notebook'
     row[0] = '(classic notebook) ' + row[0]
