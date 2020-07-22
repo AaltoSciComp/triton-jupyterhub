@@ -159,12 +159,14 @@ kernels_auto:
 	python -m bash_kernel.install --sys-prefix
 
 #	# Various Python kernels
-	( ml purge ; ml load anaconda ; ipython kernel install --name=python3 --prefix=$(KERNEL_PREFIX) )
-#	#( ml purge ; ml load anaconda2/latest ; ipython kernel install --name=python2 --prefix=$(KERNEL_PREFIX) )
-	( ml purge ; ml load anaconda3/latest ; ipython kernel install --name=python3-old --prefix=$(KERNEL_PREFIX) )
-	envkernel lmod --name=python3 --kernel-template=python3 --kernel-make-path-relative anaconda --display-name="Python 3/anaconda" --prefix=$(KERNEL_PREFIX)
-#	envkernel lmod --name=python2 --kernel-template=python2 anaconda2/latest --display-name="(old) Python 2/anaconda2/latest" --prefix=$(KERNEL_PREFIX)
-	envkernel lmod --name=python3-old --kernel-template=python3-old --kernel-make-path-relative anaconda3/latest --display-name="(old) Python 3/anaconda3/latest" --prefix=$(KERNEL_PREFIX)
+	( ml purge ; ml load anaconda             ; ipython kernel install --name=python3     --prefix=$(KERNEL_PREFIX) )
+	( ml purge ; ml load anaconda/2020-03-tf1 ; ipython kernel install --name=python3-tf1 --prefix=$(KERNEL_PREFIX) )
+#	#( ml purge ; ml load anaconda2/latest     ; ipython kernel install --name=python2     --prefix=$(KERNEL_PREFIX) )
+#	( ml purge ; ml load anaconda3/latest      ; ipython kernel install --name=python3-old --prefix=$(KERNEL_PREFIX) )
+	envkernel lmod --name=python3     --kernel-template=python3     --kernel-make-path-relative anaconda             --display-name="Python 3/anaconda"       --prefix=$(KERNEL_PREFIX)
+	envkernel lmod --name=python3-tf1 --kernel-template=python3-tf1 --kernel-make-path-relative anaconda/2020-03-tf1 --display-name="Python 3/anaconda (tf1)" --prefix=$(KERNEL_PREFIX)
+#	envkernel lmod --name=python2      --kernel-template=python2 anaconda2/latest --display-name="(old) Python 2/anaconda2/latest" --prefix=$(KERNEL_PREFIX)
+#	envkernel lmod --name=python3-old  --kernel-template=python3-old --kernel-make-path-relative anaconda3/latest --display-name="(old) Python 3/anaconda3/latest" --prefix=$(KERNEL_PREFIX)
 
 #	# Automatic kernels, everything in the list above.
 	for mod in $(CONDA_AUTO_KERNELS) ; do \
@@ -179,10 +181,12 @@ kernels_auto:
 	envkernel lmod --name=imatlab --kernel-template=imatlab --sys-prefix --env=LD_PRELOAD=/share/apps/jupyterhub/live/miniconda/lib/libstdc++.so matlab/r2019a
 
 #	IRkernel needs to be updated
-	( ml load r-irkernel/1.1-python3 ; Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)')" )
-	envkernel lmod --name=ir      --kernel-template=ir      --kernel-make-path-relative         --sys-prefix r-irkernel/1.1-python3 --display-name="R"
-	( ml load r-irkernel/1.1-python3 ; Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir-safe')" )
-	envkernel lmod --name=ir-safe --kernel-template=ir-safe --kernel-make-path-relative --purge --sys-prefix r-irkernel/1.1-python3 --display-name="R (safe)"
+	( ml load r-triton/1.0.0-python3-r-3.6.3 ;    Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir')" )
+	( ml load r-triton/1.0.0-python3-r-3.6.3 ;    Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir-safe')" )
+	( ml load r-irkernel/1.1-python3 ;            Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir-3_6_1')" )
+	envkernel lmod --name=ir       --kernel-template=ir       --kernel-make-path-relative         --sys-prefix r-triton/1.0.0-python3-r-3.6.3 --display-name="R"
+	envkernel lmod --name=ir-safe  --kernel-template=ir-safe  --kernel-make-path-relative --purge --sys-prefix r-triton/1.0.0-python3-r-3.6.3 --display-name="R (safe)"
+	envkernel lmod --name=ir-3_6_1 --kernel-template=ir-3_6_1 --kernel-make-path-relative         --sys-prefix r-irkernel/1.1-python3 --display-name="R 3.6.1"
 
 	chmod -R a+rX $(CONDA_PREFIX)/share/jupyter/kernels/
 	jupyter kernelspec list
