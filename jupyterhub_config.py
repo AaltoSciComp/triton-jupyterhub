@@ -85,6 +85,7 @@ if [ -d "$HOME"/.jupyterlab-dir ] ; then
     echo Using custom jupyterlab dir "$HOME"/.jupyterlab-dir:
     echo you are responsible for building assets.
 fi
+umask 0002
 sh {BASEDIR}/setup_tree.sh""".format(BASEDIR=BASEDIR, CONDA_PREFIX=os.environ['CONDA_PREFIX'])
 cmd = "{BASEDIR}/miniconda/bin/jupyterhub-singleuser --FileContentsManager.delete_to_trash=False".format(BASEDIR=BASEDIR)
 
