@@ -129,11 +129,11 @@ extensions_install:
 	jupyter serverextension enable --py jupyterlab_git
 
 #	# Jupytext - text-based formats for notebooks
-	conda install -c conda-forge jupytext
+#	conda install -c conda-forge jupytext
 
-#	# Jupyterlab-slurm (not at 1.0 yet)
-	pip install jupyterlab_slurm
-	jupyter labextension install jupyterlab-slurm --no-build
+#	# Jupyterlab-slurm (not at 2.0 yet)
+#	pip install jupyterlab_slurm
+#	jupyter labextension install jupyterlab-slurm --no-build
 
 #	jupyter-matplotlib
 	jupyter labextension install jupyter-matplotlib --no-build
@@ -142,6 +142,10 @@ extensions_install:
 	jupyter labextension install jupyterlab-recents --no-build
 	jupyter labextension install jupyterlab-favorites --no-build
 
+#	# Plotly
+	jupyter labextension install jupyterlab-plotly --no-build
+
+#	# Build them all at once
 	jupyter lab build
 
 #	# envkernel - to install kernels in lmod.
