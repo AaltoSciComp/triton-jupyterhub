@@ -62,6 +62,7 @@ setup_core:
 	pip install -e wrapspawner
 	conda install pycurl  # for cull_idle_servers.py
 	conda install -c conda-forge async_generator  # jupyterhub 0.9, remove later
+	pip install OAuthenticator
 
 	conda install notebook # only where it is being run
 	conda install nbconvert

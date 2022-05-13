@@ -64,6 +64,23 @@ c.LocalAuthenticator.group_whitelist = {'triton-users'}
 c.Spawner.disable_user_config = True                 # security-related
 c.JupyterHub.cookie_max_age_days = 3
 c.JupyterHub.cookie_options = dict(secure=True)
+# OAuthenticator
+if os.path.exists('/etc/jupyterhub/jupyterhub_oauth.txt'):
+    import json
+    oauth_info = json.load(open('/etc/jupyterhub/jupyterhub_oauth.txt'))
+    from oauthenticator.azuread import AzureAdOAuthenticator
+    c.JupyterHub.authenticator_class = AzureAdOAuthenticator
+    c.AzureAdOAuthenticator.tenant_id = oauth_info['tenant_id']
+    c.AzureAdOAuthenticator.client_id = oauth_info['client_id'] # client_app
+    c.AzureAdOAuthenticator.client_secret = oauth_info['client_secret']
+    # Override URLs here to use /v2.0/.
+    c.AzureAdOAuthenticator.authorize_url = 'https://login.microsoftonline.com/{0}/oauth2/v2.0/authorize'.format(oauth_info['tenant_id'])
+    c.AzureAdOAuthenticator.token_url = 'https://login.microsoftonline.com/{0}/oauth2/v2.0/token'.format(oauth_info['tenant_id'])
+    c.AzureAdOAuthenticator.oauth_callback_url = "https://jupyter.triton.aalto.fi/%shub/oauth_callback"%('dev/' if dev else '')
+    c.AzureAdOAuthenticator.scope = ['openid', 'user.read']
+    c.AzureAdOAuthenticator.username_claim = 'samAccountName' # 'email' with /v2.0/
+    c.AzureAdOAuthenticator.login_service = "Aalto account" # text label only
+
 
 #
 # Spawner config
