@@ -65,7 +65,8 @@ c.Spawner.disable_user_config = True                 # security-related
 c.JupyterHub.cookie_max_age_days = 3
 c.JupyterHub.cookie_options = dict(secure=True)
 # OAuthenticator
-if os.path.exists('/etc/jupyterhub/jupyterhub_oauth.txt'):
+use_oauthenticator = True
+if use_oauthenticator and os.path.exists('/etc/jupyterhub/jupyterhub_oauth.txt'):
     import json
     oauth_info = json.load(open('/etc/jupyterhub/jupyterhub_oauth.txt'))
     from oauthenticator.azuread import AzureAdOAuthenticator
