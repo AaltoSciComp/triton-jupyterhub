@@ -98,6 +98,7 @@ set -x
 PATH=$PATH:{CONDA_PREFIX}/bin-minimal
 echo $PATH
 unset XDG_RUNTIME_DIR
+unset SLURM_JOB_ID
 if [ -d "$HOME"/.jupyterlab-dir ] ; then
     export JUPYTERLAB_DIR="$HOME"/.jupyterlab-dir
     echo Using custom jupyterlab dir "$HOME"/.jupyterlab-dir:
