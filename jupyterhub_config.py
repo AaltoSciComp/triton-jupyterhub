@@ -96,6 +96,7 @@ prologue = """\
 set +euo pipefail
 set -x
 PATH=$PATH:{CONDA_PREFIX}/bin-minimal
+export WRKDIR=/scratch/work/$USER
 echo $PATH
 unset XDG_RUNTIME_DIR
 unset SLURM_JOB_ID
