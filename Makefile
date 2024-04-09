@@ -49,7 +49,7 @@ setup_conda:
 	echo 'Remember to "source miniconda/bin/activate"'
 
 # This is the very first setup that is needed.
-setup_core:
+setup_core_hub:
 #	false
 #	# MUST SOURCE THIS YOURSELF BEFORE RUNNING, outside of Make.
 #	source activate $PWD/miniconda
@@ -64,18 +64,20 @@ setup_core:
 	conda install -c conda-forge async_generator  # jupyterhub 0.9, remove later
 	pip install OAuthenticator PyJWT  # PyJWT custom needed for AzureAD
 
-	conda install notebook # only where it is being run
-	conda install nbconvert
+setup_core_user:
+#	#conda install notebook # only where it is being run
+#	#conda install nbconvert
 
-	pip install --upgrade jupyterlab
-	jupyter serverextension enable --py jupyterlab --sys-prefix
+#	#pip install --upgrade jupyterlab
+	conda env update --file environment.yml
+
+#	jupyter serverextension enable --py jupyterlab --sys-prefix
 #	jupyter labextension install @jupyterlab/hub-extension
 
 #	# Make a directory with only node in it - so that users can
 #	# manage extensions themselves.
 	mkdir -p $(CONDA_PREFIX)/bin-minimal
 	ln -fs ../bin/node $(CONDA_PREFIX)/bin-minimal/node
-
 
 # Done on the management node.
 user_setup:
@@ -100,34 +102,37 @@ extensions_install:
 	test ! -z "$(CONDA_PREFIX)"
 	jupyter kernelspec list
 
+#	# Disable announcement extensions
+	jupyter labextension disable "@jupyterlab/apputils-extension:announcements" --no-build
+
 #	# Widgets
-	pip install --upgrade ipywidgets
-	jupyter nbextension enable --py widgetsnbextension --sys-prefix
-	jupyter labextension install @jupyter-widgets/jupyterlab-manager
+#	pip install --upgrade ipywidgets
+#	#jupyter nbextension enable --py widgetsnbextension --sys-prefix
+#	jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
 #	# Notebook diff and merge tools
-	pip install --upgrade nbdime
-	nbdime extensions --enable --sys-prefix
-	jupyter labextension enable nbdime
+#	pip install --upgrade nbdime
+#	nbdime extensions --enable --sys-prefix
+#	jupyter labextension enable nbdime
 #	git clone gh:jupyter/nbdime ; pip install nbdime/    # fixes current bug wrt jupyterhub usage in 0.4.1
 
 #	# Lmod integration
 #	# https://github.com/cmd-ntrf/jupyter-lmod
-	pip install --upgrade jupyterlmod
-	jupyter nbextension install --py jupyterlmod --sys-prefix
-	jupyter serverextension enable --py jupyterlmod --sys-prefix
-	jupyter nbextension enable jupyterlmod --py --sys-prefix
-	jupyter labextension install jupyterlab-lmod
+#	pip install --upgrade jupyterlmod
+#	jupyter nbextension install --py jupyterlmod --sys-prefix
+#	jupyter serverextension enable --py jupyterlmod --sys-prefix
+#	jupyter nbextension enable jupyterlmod --py --sys-prefix
+#	jupyter labextension install jupyterlab-lmod
 
 #	# javascript extensions for various things
-	pip install --upgrade jupyter_contrib_nbextensions
-	jupyter contrib nbextension install --sys-prefix
+#	pip install --upgrade jupyter_contrib_nbextensions
+#	jupyter contrib nbextension install --sys-prefix
 #	#jupyter nbextension enable [...name...]
 #	jupyter nbextension enable varInspector/main --sys-prefix  # Causes random slowdown.
 
-	jupyter labextension install @jupyterlab/git --no-build
-	pip install --upgrade jupyterlab-git
-	jupyter serverextension enable --py jupyterlab_git
+#	jupyter labextension install @jupyterlab/git --no-build
+#	pip install --upgrade jupyterlab-git
+#	jupyter serverextension enable --py jupyterlab_git
 
 #	# Jupytext - text-based formats for notebooks
 #	conda install -c conda-forge jupytext
@@ -137,61 +142,55 @@ extensions_install:
 #	jupyter labextension install jupyterlab-slurm --no-build
 
 #	jupyter-matplotlib
-	jupyter labextension install jupyter-matplotlib --no-build
+#	jupyter labextension install jupyter-matplotlib --no-build
 
 # 	Recents and favorites
-	jupyter labextension install jupyterlab-recents --no-build
-	jupyter labextension install jupyterlab-favorites --no-build
+#	jupyter labextension install jupyterlab-recents --no-build
+#	jupyter labextension install jupyterlab-favorites --no-build
 
 #	# Plotly
-	jupyter labextension install jupyterlab-plotly --no-build
+#	jupyter labextension install jupyterlab-plotly --no-build
 
 #	# Build them all at once
 	jupyter lab build
 
 #	# envkernel - to install kernels in lmod.
-	pip install git+https://github.com/NordicHPC/envkernel
+#	pip install git+https://github.com/NordicHPC/envkernel
 
 #  These kernels can be installed automatically: just source anaconda and run this
-CONDA_AUTO_KERNELS=pypy3/5.10.1-py3.5 pypy2/5.10.0-py2.7
+CONDA_AUTO_KERNELS=#
 
 kernels_auto:
 	test ! -z "$(CONDA_PREFIX)"
 
 #	# Bash
 #	# https://github.com/takluyver/bash_kernel
-	pip install --upgrade bash_kernel
 	python -m bash_kernel.install --sys-prefix
 
 #	# Various Python kernels
-	( ml purge ; ml load anaconda             ; ipython kernel install --name=python3     --prefix=$(KERNEL_PREFIX) )
-	( ml purge ; ml load anaconda/2020-03-tf1 ; ipython kernel install --name=python3-tf1 --prefix=$(KERNEL_PREFIX) )
-#	#( ml purge ; ml load anaconda2/latest     ; ipython kernel install --name=python2     --prefix=$(KERNEL_PREFIX) )
-#	( ml purge ; ml load anaconda3/latest      ; ipython kernel install --name=python3-old --prefix=$(KERNEL_PREFIX) )
-	envkernel lmod --name=python3     --kernel-template=python3     --kernel-make-path-relative anaconda             --display-name="Python (module anaconda)"       --prefix=$(KERNEL_PREFIX)
-	envkernel lmod --name=python3-tf1 --kernel-template=python3-tf1 --kernel-make-path-relative anaconda/2020-03-tf1 --display-name="Python (module anaconda/2020-03-tf1)" --prefix=$(KERNEL_PREFIX)
-#	envkernel lmod --name=python2      --kernel-template=python2 anaconda2/latest --display-name="(old) Python 2/anaconda2/latest" --prefix=$(KERNEL_PREFIX)
-#	envkernel lmod --name=python3-old  --kernel-template=python3-old --kernel-make-path-relative anaconda3/latest --display-name="(old) Python 3/anaconda3/latest" --prefix=$(KERNEL_PREFIX)
+	( ml purge ; ml load scicomp-python-env/2024-01             ; ipython kernel install --name=python3     --prefix=$(KERNEL_PREFIX) )
+	envkernel lmod --name=python3     --kernel-template=python3     --kernel-make-path-relative scicomp-python-env/2024-01             --display-name="Python generic (scicomp-python-env/2024-01)"       --prefix=$(KERNEL_PREFIX)
+#	( ml purge ; ml load anaconda/2020-03-tf1 ; ipython kernel install --name=python3-tf1 --prefix=$(KERNEL_PREFIX) )
+#	envkernel lmod --name=python3-tf1 --kernel-template=python3-tf1 --kernel-make-path-relative anaconda/2020-03-tf1 --display-name="Python (module anaconda/2020-03-tf1)" --prefix=$(KERNEL_PREFIX)
 
 #	# Automatic kernels, everything in the list above.
 	for mod in $(CONDA_AUTO_KERNELS) ; do \
-		( ml purge ; ml load $$mod ; ipython kernel install --name=`echo $$mod | tr / _` --display-name="Module $$mod" --prefix=$(KERNEL_PREFIX) ; ) ; \
+		( ml purge ; ml load $$mod ; ipython kernel install --name=`echo $$mod | tr / _` --display-name="Python (module $$mod)" --prefix=$(KERNEL_PREFIX) ; ) ; \
 		envkernel lmod --name=`echo $$mod | tr / _` --kernel-template=`echo $$mod | tr / _` --kernel-make-path-relative --prefix=$(KERNEL_PREFIX) $$mod  ; \
 	done
 
 #	# Matlab (imatlab, not using older matlab_kernel any more).
-	cd /share/apps/matlab/R2019a/extern/engines/python/ && python setup.py install
-	pip install --upgrade imatlab
-	python -m imatlab install --sys-prefix --name=imatlab --display-name="Matlab (module matlab/r2019a)"
-	envkernel lmod --name=imatlab --kernel-template=imatlab --sys-prefix --env=LD_PRELOAD=/share/apps/jupyterhub/live/miniconda/lib/libstdc++.so matlab/r2019a
+#	cd /appl/manual_installations/software/matlab/r2023b/extern/engines/python/ && python setup.py install
+#	python -m imatlab install --sys-prefix --name=imatlab --display-name="Matlab (module matlab/r2023b)"
+#	envkernel lmod --name=imatlab --kernel-template=imatlab --sys-prefix --env=LD_PRELOAD=/share/apps/jupyterhub/live/miniconda/lib/libstdc++.so matlab/r2023b
 
 #	IRkernel needs to be updated
-	( ml load r-triton/1.0.0-python3-r-3.6.3 ;    Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir')" )
-	( ml load r-triton/1.0.0-python3-r-3.6.3 ;    Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir-safe')" )
-	( ml load r-irkernel/1.1-python3 ;            Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir-3_6_1')" )
-	envkernel lmod --name=ir       --kernel-template=ir       --kernel-make-path-relative         --sys-prefix r-triton/1.0.0-python3-r-3.6.3 --display-name="R (module r-triton/1.0.0-python3-r-3.6.3)"
-	envkernel lmod --name=ir-safe  --kernel-template=ir-safe  --kernel-make-path-relative --purge --sys-prefix r-triton/1.0.0-python3-r-3.6.3 --display-name="R (safe, module r-triton/1.0.0-python3-r-3.6.3)"
-	envkernel lmod --name=ir-3_6_1 --kernel-template=ir-3_6_1 --kernel-make-path-relative         --sys-prefix r-irkernel/1.1-python3 --display-name="R 3.6.1 (module r-irkernel/1.1-python3)"
+#	( ml load r-triton/1.0.0-python3-r-3.6.3 ;    Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir')" )
+#	( ml load r-triton/1.0.0-python3-r-3.6.3 ;    Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir-safe')" )
+#	( ml load r-irkernel/1.1-python3 ;            Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir-3_6_1')" )
+#	envkernel lmod --name=ir       --kernel-template=ir       --kernel-make-path-relative         --sys-prefix r-triton/1.0.0-python3-r-3.6.3 --display-name="R (module r-triton/1.0.0-python3-r-3.6.3)"
+#	envkernel lmod --name=ir-safe  --kernel-template=ir-safe  --kernel-make-path-relative --purge --sys-prefix r-triton/1.0.0-python3-r-3.6.3 --display-name="R (safe, module r-triton/1.0.0-python3-r-3.6.3)"
+#	envkernel lmod --name=ir-3_6_1 --kernel-template=ir-3_6_1 --kernel-make-path-relative         --sys-prefix r-irkernel/1.1-python3 --display-name="R 3.6.1 (module r-irkernel/1.1-python3)"
 
 	chmod -R a+rX $(CONDA_PREFIX)/share/jupyter/kernels/
 	jupyter kernelspec list

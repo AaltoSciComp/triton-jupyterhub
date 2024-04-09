@@ -1,5 +1,7 @@
 #!/bin/bash -l
 
+set -x
+
 WRKDIR=/scratch/work/$USER
 # Create Jupyter home tree
 JHOME=$HOME/.jupyterhub-tree
