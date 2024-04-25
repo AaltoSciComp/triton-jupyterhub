@@ -185,11 +185,11 @@ kernels_auto:
 #	envkernel lmod --name=imatlab --kernel-template=imatlab --sys-prefix --env=LD_PRELOAD=/share/apps/jupyterhub/live/miniconda/lib/libstdc++.so matlab/r2023b
 
 #	IRkernel needs to be updated
-#	( ml load r-triton/1.0.0-python3-r-3.6.3 ;    Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir')" )
-#	( ml load r-triton/1.0.0-python3-r-3.6.3 ;    Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir-safe')" )
+	( ml load scicomp-r-env/2024-01 ;    Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir')" )
+	( ml load scicomp-r-env/2024-01 ;    Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir-safe')" )
 #	( ml load r-irkernel/1.1-python3 ;            Rscript -e "IRkernel::installspec(user = FALSE, prefix='$(KERNEL_PREFIX)', name='ir-3_6_1')" )
-#	envkernel lmod --name=ir       --kernel-template=ir       --kernel-make-path-relative         --sys-prefix r-triton/1.0.0-python3-r-3.6.3 --display-name="R (module r-triton/1.0.0-python3-r-3.6.3)"
-#	envkernel lmod --name=ir-safe  --kernel-template=ir-safe  --kernel-make-path-relative --purge --sys-prefix r-triton/1.0.0-python3-r-3.6.3 --display-name="R (safe, module r-triton/1.0.0-python3-r-3.6.3)"
+	envkernel lmod --name=ir       --kernel-template=ir       --kernel-make-path-relative         --sys-prefix scicomp-r-env/2024-01 --display-name="R (module scicomp-r-env/2024-01)"
+	envkernel lmod --name=ir-safe  --kernel-template=ir-safe  --kernel-make-path-relative --purge --sys-prefix scicomp-r-env/2024-01 --display-name="R (safe, module scicomp-r-env/2024-01)"
 #	envkernel lmod --name=ir-3_6_1 --kernel-template=ir-3_6_1 --kernel-make-path-relative         --sys-prefix r-irkernel/1.1-python3 --display-name="R 3.6.1 (module r-irkernel/1.1-python3)"
 
 	chmod -R a+rX $(CONDA_PREFIX)/share/jupyter/kernels/
