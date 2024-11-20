@@ -1,0 +1,21 @@
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - anywidget    # matplotlib plotting
+  - ipympl       # matplotlib plotting
+  - ipywidgets
+  - jupyterlab
+  - jupyterlab-git
+  - nbconvert
+  - nbdime
+  - nodejs       # building jupyterlab modules
+  - notebook
+  - pip
+  - plotly       # plotly plotting
+  - pip:
+    - bash_kernel
+    - envkernel
+    - imatlab
+    #- jupyterlab-slurm
+    - jupyterlmod
