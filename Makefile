@@ -158,7 +158,7 @@ extensions_install:
 #	pip install git+https://github.com/NordicHPC/envkernel
 
 #  These kernels can be installed automatically: just source anaconda and run this
-CONDA_AUTO_KERNELS=#
+CONDA_AUTO_KERNELS="neuroimaging-env"
 
 kernels_auto:
 	test ! -z "$(CONDA_PREFIX)"
@@ -172,6 +172,8 @@ kernels_auto:
 	envkernel lmod --name=python3     --kernel-template=python3     --kernel-make-path-relative scicomp-python-env/2024-01             --display-name="Python generic (scicomp-python-env/2024-01)"       --prefix=$(KERNEL_PREFIX)
 #	( ml purge ; ml load anaconda/2020-03-tf1 ; ipython kernel install --name=python3-tf1 --prefix=$(KERNEL_PREFIX) )
 #	envkernel lmod --name=python3-tf1 --kernel-template=python3-tf1 --kernel-make-path-relative anaconda/2020-03-tf1 --display-name="Python (module anaconda/2020-03-tf1)" --prefix=$(KERNEL_PREFIX)
+	( ml purge ; ml load scicomp-llm-env             ; ipython kernel install --name=python3-llm     --prefix=$(KERNEL_PREFIX) )
+	envkernel lmod --name=python3-llm     --kernel-template=python3-llm     --kernel-make-path-relative scicomp-llm-env             --display-name="Python LLM env (scicomp-llm-env)"       --prefix=$(KERNEL_PREFIX)
 
 #	# Automatic kernels, everything in the list above.
 	for mod in $(CONDA_AUTO_KERNELS) ; do \
